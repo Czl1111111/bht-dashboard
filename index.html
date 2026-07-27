@@ -1,0 +1,5596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BHT产品线 - 运营数据看板</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+if(typeof Chart==='undefined'){
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.7/chart.umd.min.js';
+  document.head.appendChild(s);
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:#0f1119;color:#e1e4ea;line-height:1.6;padding:16px}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.hdr h1{font-size:22px;font-weight:700;color:#fff}
+.badge{background:#1e2030;border:1px solid #2a2d3e;border-radius:8px;padding:5px 12px;font-size:12px;color:#8b90a0}
+.tab-nav{display:flex;gap:3px;margin-bottom:14px;background:#161822;border-radius:10px;padding:3px;width:fit-content;flex-wrap:wrap}
+.tab-btn{padding:6px 13px;border:none;background:transparent;color:#8b90a0;cursor:pointer;border-radius:7px;font-size:11px;font-weight:500;transition:all 0.15s}
+.tab-btn.active{background:#7c3aed;color:#fff}
+.tab-btn:hover:not(.active){color:#fff;background:#1e2030}
+.tab-sep{width:1px;background:#2a2d3e;margin:2px 4px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:14px}
+.kpi-card{background:#161822;border:1px solid #232638;border-radius:10px;padding:14px 16px;position:relative}
+.kpi-card .lbl{font-size:10px;color:#8b90a0;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.kpi-card .val{font-size:24px;font-weight:700;color:#fff}
+.kpi-card .sub{font-size:11px;margin-top:2px}
+.g{color:#22c55e}.r{color:#ef4444}.y{color:#f59e0b}.n{color:#8b90a0}
+.dot{position:absolute;top:10px;right:12px;width:7px;height:7px;border-radius:50%}
+.dg{background:#22c55e;box-shadow:0 0 6px #22c55e88}
+.dr{background:#ef4444;box-shadow:0 0 6px #ef444488}
+.dy{background:#f59e0b;box-shadow:0 0 6px #f59e0b88}
+.charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:12px;margin-bottom:14px}
+.chart-panel{background:#161822;border:1px solid #232638;border-radius:10px;padding:16px}
+.chart-panel h3{font-size:13px;color:#fff;margin-bottom:12px;font-weight:600}
+canvas{max-height:300px}
+.section-title{font-size:15px;font-weight:700;color:#fff;margin:16px 0 10px}
+.alert-item{background:#1a1c2a;border-left:4px solid #ef4444;border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:6px;display:flex;gap:8px;align-items:flex-start}
+.alert-item.warn{border-left-color:#f59e0b}
+.alert-item .ai{font-size:15px;flex-shrink:0}
+.alert-item .at{font-weight:600;color:#fff;margin-bottom:1px;font-size:13px}
+.alert-item .ad{font-size:11px;color:#8b90a0}
+.table-wrap{background:#161822;border:1px solid #232638;border-radius:10px;overflow:hidden;margin-bottom:16px}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}
+thead th{background:#1e2030;color:#8b90a0;font-weight:600;padding:8px 9px;text-align:left;position:sticky;top:0}
+tbody td{padding:6px 9px;border-bottom:1px solid #1e2030}
+tbody tr:hover{background:#1a1c2a}
+.subtot td{font-weight:700;background:#1a1c2a;border-top:2px solid #232638}
+.tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.tgr{background:#ef444420;color:#ef4444}.tgg{background:#22c55e20;color:#22c55e}.tgy{background:#f59e0b20;color:#f59e0b}
+.hx-section{background:linear-gradient(135deg,#1a1040,#161822);border:1px solid #7c3aed40;border-radius:10px;padding:16px;margin-bottom:16px}
+.hx-section h3{color:#a78bfa;margin-bottom:10px;font-size:15px}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:7px}
+.plan-item{background:#16182288;border:1px solid #2a2d3e;border-radius:8px;padding:10px}
+.plan-item .pp{font-size:9px;font-weight:700;margin-bottom:2px}
+.plan-item .pt{font-size:12px;font-weight:600;color:#fff;margin-bottom:2px}
+.plan-item .pi{font-size:16px;font-weight:700;color:#22c55e;margin-bottom:2px}
+.plan-item .pd{font-size:10px;color:#8b90a0}
+.todo-wrap{background:#161822;border:1px solid #232638;border-radius:10px;padding:16px;margin-bottom:16px}
+.todo-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.todo-hdr h3{font-size:15px;color:#fff;margin:0}
+.todo-add{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.todo-add input,.todo-add select{padding:7px 9px;background:#1e2030;border:1px solid #2a2d3e;border-radius:6px;color:#fff;font-size:11px}
+.todo-add input{flex:1;min-width:180px}
+.todo-add button{padding:7px 14px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap}
+.todo-add button:hover{background:#6d28d9}
+.todo-progress{margin-bottom:10px;height:5px;background:#1e2030;border-radius:3px;overflow:hidden}
+.todo-bar{height:100%;background:#22c55e;border-radius:3px;transition:width 0.3s}
+.todo-stats{font-size:11px;color:#8b90a0;margin-bottom:10px}
+.todo-item{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:3px;background:#1a1c2a;border-radius:7px;transition:all 0.15s}
+.todo-item.done{opacity:0.5}
+.todo-item.done .todo-text{text-decoration:line-through;color:#6b7280}
+.todo-check{width:18px;height:18px;border:2px solid #3b3d52;border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s;font-size:11px;color:transparent}
+.todo-check.on{background:#22c55e;border-color:#22c55e;color:#fff}
+.todo-text{flex:1;font-size:12px;color:#e1e4ea;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background 0.15s}
+.todo-text:hover{background:#232638}
+.todo-edit{flex:1;font-size:12px;padding:4px 6px;background:#1e2030;border:1px solid #7c3aed;border-radius:4px;color:#fff;outline:none}
+.todo-week{font-size:9px;background:#1e2030;padding:2px 7px;border-radius:4px;color:#8b90a0;white-space:nowrap}
+.todo-prio{font-size:9px;font-weight:700;white-space:nowrap}
+.todo-del{background:none;border:none;color:#4a4d5e;cursor:pointer;font-size:14px;padding:1px 5px;border-radius:4px}
+.todo-del:hover{color:#ef4444;background:#ef444410}
+.prio-filter{background:#1e2030;border:1px solid #2a2d3e;border-radius:4px;color:#8b90a0;cursor:pointer;font-size:9px;padding:2px 7px;font-weight:600;transition:all 0.12s}
+.prio-filter:hover{color:#fff;border-color:#7c3aed}
+.prio-filter.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.foot{text-align:center;color:#4a4d5e;font-size:10px;margin-top:16px;padding:10px}
+.historical-toggle{background:#1e2030;border:1px solid #2a2d3e;border-radius:6px;color:#8b90a0;padding:5px 12px;cursor:pointer;font-size:10px;margin-left:8px}
+.historical-toggle:hover{color:#fff;border-color:#7c3aed}
+.week-trend{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:4px;margin-bottom:14px}
+.wt-item{background:#161822;border:1px solid #232638;border-radius:8px;padding:8px 10px;text-align:center}
+.wt-item .wt-lbl{font-size:9px;color:#8b90a0;margin-bottom:2px}
+.wt-item .wt-val{font-size:14px;font-weight:700}
+.wt-item.real{border-color:#22c55e40}
+.wt-item.est{border-color:#f59e0b40}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div><h1>BHT产品线 - 运营数据看板</h1><span style="color:#8b90a0;font-size:12px">haisstronica-US | Butt Terminals | 张璐</span></div>
+  <div class="badge" id="dateBadge">Loading...</div>
+</div>
+<div class="tab-nav" id="tabWeek" style="margin-bottom:4px"></div>
+<div class="tab-nav" id="tabMonth" style="margin-bottom:14px"></div>
+<div class="kpi-row" id="kpiRow"></div>
+<div class="charts-row">
+  <div class="chart-panel"><h3>各父ASIN毛利率对比</h3><canvas id="chartMargin"></canvas></div>
+  <div class="chart-panel"><h3>成本结构拆解 (仅月度)</h3><canvas id="chartCost"></canvas></div>
+</div>
+<div class="charts-row">
+  <div class="chart-panel"><h3>22个SKU毛利率排名</h3><canvas id="chartSKU"></canvas></div>
+  <div class="chart-panel"><h3>销售额 vs 广告费对比</h3><canvas id="chartSalesAd"></canvas></div>
+</div>
+<div id="alertsSection"></div>
+<div class="todo-wrap">
+  <div class="todo-hdr"><h3>待办事项清单</h3><span style="font-size:11px;color:#8b90a0">勾选=完成 | 双击文字编辑 | 自动保存</span></div>
+  <div class="todo-progress"><div class="todo-bar" id="todoBar" style="width:0%"></div></div>
+  <div class="todo-stats" id="todoStats"></div>
+  <div class="todo-add">
+    <input type="text" id="newTodoText" placeholder="新增待办..." onkeydown="if(event.key==='Enter')addTodo()">
+    <select id="newTodoWeek"><option value="w07_1">7月W1</option><option value="w07_2">7月W2</option><option value="w07_3">7月W3</option><option value="w07_4">7月W4</option><option value="w07_5">7月W5</option><option value="w08_1">8月W1</option><option value="w08_2">8月W2</option><option value="w08_3">8月W3</option><option value="w08_4">8月W4</option><option value="general">通用</option></select>
+    <select id="newTodoPrio" onchange="prioFilter=this.value;renderTodos()"><option value="all">全部</option><option value="P0">P0</option><option value="P1" selected>P1</option><option value="P2">P2</option></select>
+    <button onclick="addTodo()">+ 添加</button>
+  </div>
+  <div id="todoList"></div>
+</div>
+<div class="hx-section">
+  <h3>HX1045 专项优化 - 不砍广告、守住排名</h3>
+  <div class="plan-grid">
+    <div class="plan-item"><div class="pp" style="color:#ef4444">P0</div><div class="pt">涨$1.0 ($26->$27)</div><div class="pi">+$1,870/月</div><div class="pd">BSR第7有定价权,观察3天转化率</div></div>
+    <div class="plan-item"><div class="pp" style="color:#ef4444">P0</div><div class="pt">广告提效(不降总额)</div><div class="pi">+$500~800/月</div><div class="pd">ACoS>50%词降bid转给ACoS<25%词</div></div>
+    <div class="plan-item"><div class="pp" style="color:#ef4444">P0</div><div class="pt">TOS竞价系数调整</div><div class="pi">+$300~500/月</div><div class="pd">搜索顶部+20%bid,产品页-50%bid</div></div>
+    <div class="plan-item"><div class="pp" style="color:#f59e0b">P1</div><div class="pt">变体间流量引导</div><div class="pi">+$300~500/月</div><div class="pd">A+推荐高利润变体(HX1822/HX1821)</div></div>
+    <div class="plan-item"><div class="pp" style="color:#f59e0b">P1</div><div class="pt">采购价降3%</div><div class="pi">+$566/月</div><div class="pd">月采1870件,备3家供应商比价</div></div>
+    <div class="plan-item"><div class="pp" style="color:#22c55e">P2</div><div class="pt">Listing优化提自然CVR</div><div class="pi">+$200~400/月</div><div class="pd">自然CVR仅13%远低广告CVR25%</div></div>
+  </div>
+  <div style="margin-top:10px;padding:8px;background:#22c55e15;border-radius:8px;text-align:center"><span style="font-weight:700;color:#22c55e">保守月增$3,500+ | HX1045毛利率 -4.39% -> +3%+ | 排名不受影响</span></div>
+</div>
+<div class="table-wrap">
+  <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><span class="section-title" style="margin:0;font-size:14px">22个SKU明细</span><span style="font-size:10px;color:#8b90a0">绿>=15% 黄0~15% 红<0%</span></div>
+  <div class="table-scroll"><table><thead><tr><th>父ASIN</th><th>SKU</th><th>品名</th><th>销量</th><th>销售额</th><th>广告费</th><th>ACoS</th><th>TACoS</th><th>毛利率</th><th>BSR</th><th>CVR</th><th>退货率</th><th>状态</th></tr></thead><tbody id="skuTbody"></tbody></table></div>
+</div>
+<div class="foot">更新流程: 领星导出3报表到桌面 -> 运行 bht_data/run_pipeline.py -> 刷新本页<br>数据文件夹: C:/Users/haishan10/bht_data/ | 更新: 每周四下午</div>
+
+<script>
+var DATA = {
+  "date": "2026-07-01~2026-07-27",
+  "gen": "2026-07-27 17:48",
+  "total": {
+    "margin": 7.64,
+    "target": 8.0,
+    "sales": 145944,
+    "ad": 23408,
+    "tacos": 16.04,
+    "orders": 6139,
+    "profit": 11146,
+    "gap": 530
+  },
+  "parents": {
+    "B09N9815DF": {
+      "name": "330BHT(盒装)",
+      "n": 7,
+      "o": 3262,
+      "s": 82136,
+      "ad": 15505,
+      "pf": 2474,
+      "margin": 3.01,
+      "tacos": 18.88
+    },
+    "B0C3QMWY9K": {
+      "name": "瓶装BHT",
+      "n": 5,
+      "o": 2445,
+      "s": 46109,
+      "ad": 6126,
+      "pf": 5663,
+      "margin": 12.28,
+      "tacos": 13.29
+    },
+    "B09G9RL5D3": {
+      "name": "袋装BHT",
+      "n": 7,
+      "o": 422,
+      "s": 17230,
+      "ad": 1469,
+      "pf": 3313,
+      "margin": 19.23,
+      "tacos": 8.53
+    },
+    "B0FN7BFHQY": {
+      "name": "蓝黄BHT",
+      "n": 3,
+      "o": 10,
+      "s": 469,
+      "ad": 308,
+      "pf": -304,
+      "margin": -64.82,
+      "tacos": 65.67
+    }
+  },
+  "skus": [
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1045",
+      "name": "BHT盒装-330pcs",
+      "o": 1870,
+      "s": 49036,
+      "ad": 12242,
+      "acos": "35.03%",
+      "tacos": "24.82%",
+      "margin": "-4.39%",
+      "bsr": "Butt Terminals：7",
+      "cvr": "20.61%",
+      "ret": "0.79%",
+      "ncvr": "13.01%",
+      "acvr": "25.09%",
+      "pf": -2150,
+      "fba": 10033,
+      "cogs": 18872
+    },
+    {
+      "p": "B0C3QMWY9K",
+      "sku": "HX1025",
+      "name": "BHT瓶装-200pcs-蓝",
+      "o": 931,
+      "s": 17122,
+      "ad": 2698,
+      "acos": "30.01%",
+      "tacos": "17.24%",
+      "margin": "7.95%",
+      "bsr": "Butt Terminals：14",
+      "cvr": "44.59%",
+      "ret": "0.37%",
+      "ncvr": "47.05%",
+      "acvr": "43.20%",
+      "pf": 1362,
+      "fba": 4008,
+      "cogs": 6127
+    },
+    {
+      "p": "B0C3QMWY9K",
+      "sku": "HX1026",
+      "name": "BHT瓶装-200pcs-红",
+      "o": 873,
+      "s": 16303,
+      "ad": 1826,
+      "acos": "26.26%",
+      "tacos": "11.52%",
+      "margin": "16.46%",
+      "bsr": "Butt Terminals：14",
+      "cvr": "53.56%",
+      "ret": "0.61%",
+      "ncvr": "66.39%",
+      "acvr": "44.70%",
+      "pf": 2683,
+      "fba": 3796,
+      "cogs": 5020
+    },
+    {
+      "p": "B0C3QMWY9K",
+      "sku": "HX1027",
+      "name": "BHT瓶装-120pcs-黄",
+      "o": 496,
+      "s": 9171,
+      "ad": 1464,
+      "acos": "25.70%",
+      "tacos": "17.04%",
+      "margin": "9.05%",
+      "bsr": "Butt Terminals：14",
+      "cvr": "45.02%",
+      "ret": "0.45%",
+      "ncvr": "40.40%",
+      "acvr": "47.57%",
+      "pf": 830,
+      "fba": 2160,
+      "cogs": 2920
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1053",
+      "name": "BHT盒装200pcs-4",
+      "o": 454,
+      "s": 9399,
+      "ad": 1572,
+      "acos": "36.10%",
+      "tacos": "17.99%",
+      "margin": "4.38%",
+      "bsr": "Butt Terminals：6",
+      "cvr": "21.66%",
+      "ret": "0.71%",
+      "ncvr": "19.90%",
+      "acvr": "23.77%",
+      "pf": 412,
+      "fba": 2202,
+      "cogs": 3003
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1820",
+      "name": "BHT盒装-80pcs",
+      "o": 341,
+      "s": 4134,
+      "ad": 310,
+      "acos": "35.12%",
+      "tacos": "8.73%",
+      "margin": "17.93%",
+      "bsr": "Butt Terminals：7",
+      "cvr": "18.48%",
+      "ret": "2.80%",
+      "ncvr": "19.15%",
+      "acvr": "16.05%",
+      "pf": 741,
+      "fba": 1235,
+      "cogs": 924
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1821",
+      "name": "BHT盒装-120pcs",
+      "o": 241,
+      "s": 3856,
+      "ad": 234,
+      "acos": "30.84%",
+      "tacos": "6.43%",
+      "margin": "20.32%",
+      "bsr": "Butt Terminals：6",
+      "cvr": "19.86%",
+      "ret": "0.87%",
+      "ncvr": "19.34%",
+      "acvr": "22.34%",
+      "pf": 784,
+      "fba": 1020,
+      "cogs": 928
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1822",
+      "name": "BHT盒装-420pcs",
+      "o": 172,
+      "s": 5954,
+      "ad": 298,
+      "acos": "30.73%",
+      "tacos": "5.41%",
+      "margin": "20.32%",
+      "bsr": "Butt Terminals：6",
+      "cvr": "17.00%",
+      "ret": "0.00%",
+      "ncvr": "16.19%",
+      "acvr": "20.92%",
+      "pf": 1210,
+      "fba": 977,
+      "cogs": 2190
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1234",
+      "name": "BHT袋装-500pcs-红",
+      "o": 153,
+      "s": 5772,
+      "ad": 664,
+      "acos": "30.98%",
+      "tacos": "12.93%",
+      "margin": "18.26%",
+      "bsr": "Butt Terminals：132",
+      "cvr": "40.56%",
+      "ret": "0.00%",
+      "ncvr": "69.15%",
+      "acvr": "26.56%",
+      "pf": 1054,
+      "fba": 793,
+      "cogs": 2099
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1233",
+      "name": "BHT袋装-500pcs-蓝",
+      "o": 143,
+      "s": 5416,
+      "ad": 557,
+      "acos": "24.85%",
+      "tacos": "11.16%",
+      "margin": "13.17%",
+      "bsr": "Butt Terminals：132",
+      "cvr": "37.63%",
+      "ret": "0.00%",
+      "ncvr": "43.94%",
+      "acvr": "32.52%",
+      "pf": 713,
+      "fba": 813,
+      "cogs": 2270
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1599",
+      "name": "BHT盒装-580pcs",
+      "o": 95,
+      "s": 4476,
+      "ad": 429,
+      "acos": "26.00%",
+      "tacos": "9.95%",
+      "margin": "18.76%",
+      "bsr": "Butt Terminals：7",
+      "cvr": "11.23%",
+      "ret": "0.00%",
+      "ncvr": "9.04%",
+      "acvr": "16.29%",
+      "pf": 840,
+      "fba": 591,
+      "cogs": 1703
+    },
+    {
+      "p": "B09N9815DF",
+      "sku": "HX1352",
+      "name": "BHT-蓝黄盒子-660pcs",
+      "o": 89,
+      "s": 5281,
+      "ad": 420,
+      "acos": "19.42%",
+      "tacos": "8.68%",
+      "margin": "12.07%",
+      "bsr": "Butt Terminals：7",
+      "cvr": "7.92%",
+      "ret": "0.00%",
+      "ncvr": "3.12%",
+      "acvr": "16.52%",
+      "pf": 637,
+      "fba": 727,
+      "cogs": 2216
+    },
+    {
+      "p": "B0C3QMWY9K",
+      "sku": "HX1046",
+      "name": "BHT瓶装-500pcs-白",
+      "o": 88,
+      "s": 2458,
+      "ad": 130,
+      "acos": "26.47%",
+      "tacos": "5.66%",
+      "margin": "23.07%",
+      "bsr": "Butt Terminals：13",
+      "cvr": "21.36%",
+      "ret": "0.00%",
+      "ncvr": "27.08%",
+      "acvr": "12.98%",
+      "pf": 567,
+      "fba": 357,
+      "cogs": 981
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1236",
+      "name": "BHT袋装-250pcs-黄",
+      "o": 59,
+      "s": 1972,
+      "ad": 244,
+      "acos": "22.44%",
+      "tacos": "11.97%",
+      "margin": "16.45%",
+      "bsr": "Butt Terminals：103",
+      "cvr": "37.16%",
+      "ret": "0.00%",
+      "ncvr": "29.17%",
+      "acvr": "44.74%",
+      "pf": 324,
+      "fba": 334,
+      "cogs": 711
+    },
+    {
+      "p": "B0C3QMWY9K",
+      "sku": "HX1819",
+      "name": "BHT瓶装-200pcs-三色混装",
+      "o": 57,
+      "s": 1055,
+      "ad": 8,
+      "acos": "10.50%",
+      "tacos": "0.78%",
+      "margin": "20.95%",
+      "bsr": "Butt Terminals：14",
+      "cvr": "18.08%",
+      "ret": "1.92%",
+      "ncvr": "17.74%",
+      "acvr": "33.33%",
+      "pf": 221,
+      "fba": 243,
+      "cogs": 415
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1614",
+      "name": "BHT袋装-1000pcs-红",
+      "o": 19,
+      "s": 1389,
+      "ad": 1,
+      "acos": "0.45%",
+      "tacos": "0.09%",
+      "margin": "26.76%",
+      "bsr": "Butt Terminals：132",
+      "cvr": "50.00%",
+      "ret": "0.00%",
+      "ncvr": "44.00%",
+      "acvr": "200.00%",
+      "pf": 372,
+      "fba": 124,
+      "cogs": 553
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1616",
+      "name": "BHT袋装-500pcs-黄",
+      "o": 18,
+      "s": 1180,
+      "ad": 2,
+      "acos": "3.09%",
+      "tacos": "0.32%",
+      "margin": "34.26%",
+      "bsr": "Butt Terminals：99",
+      "cvr": "15.79%",
+      "ret": "0.00%",
+      "ncvr": "14.55%",
+      "acvr": "50.00%",
+      "pf": 404,
+      "fba": 136,
+      "cogs": 428
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1235",
+      "name": "BHT袋装-500pcs-白",
+      "o": 17,
+      "s": 528,
+      "ad": 0,
+      "acos": "81.82%",
+      "tacos": "0.02%",
+      "margin": "27.29%",
+      "bsr": "Butt Terminals：132",
+      "cvr": "30.77%",
+      "ret": "0.00%",
+      "ncvr": "30.77%",
+      "acvr": "0.00%",
+      "pf": 144,
+      "fba": 71,
+      "cogs": 185
+    },
+    {
+      "p": "B09G9RL5D3",
+      "sku": "HX1615",
+      "name": "BHT袋装-1000pcs-蓝",
+      "o": 13,
+      "s": 973,
+      "ad": 1,
+      "acos": "3475.00%",
+      "tacos": "0.12%",
+      "margin": "31.02%",
+      "bsr": "Butt Terminals：132",
+      "cvr": "28.00%",
+      "ret": "0.00%",
+      "ncvr": "28.57%",
+      "acvr": "0.00%",
+      "pf": 302,
+      "fba": 134,
+      "cogs": 410
+    },
+    {
+      "p": "B0FN7BFHQY",
+      "sku": "HX2091",
+      "name": "BHT-蓝黄盒子-620pcs",
+      "o": 6,
+      "s": 321,
+      "ad": 69,
+      "acos": "38.76%",
+      "tacos": "19.63%",
+      "margin": "-4.20%",
+      "bsr": "Butt Terminals：640",
+      "cvr": "7.69%",
+      "ret": "0.00%",
+      "ncvr": "5.26%",
+      "acvr": "10.00%",
+      "pf": -13,
+      "fba": 44,
+      "cogs": 108
+    },
+    {
+      "p": "B0FN7BFHQY",
+      "sku": "HX2089",
+      "name": "BHT-蓝黄盒子-420pcs",
+      "o": 4,
+      "s": 148,
+      "ad": 95,
+      "acos": "31.48%",
+      "tacos": "35.12%",
+      "margin": "-77.89%",
+      "bsr": "Butt Terminals：641",
+      "cvr": "9.38%",
+      "ret": "0.00%",
+      "ncvr": "-9.52%",
+      "acvr": "18.60%",
+      "pf": -115,
+      "fba": 54,
+      "cogs": 62
+    },
+    {
+      "p": "B0FN7BFHQY",
+      "sku": "HX2090",
+      "name": "BHT-蓝黄盒子-520pcs",
+      "o": 0,
+      "s": 0,
+      "ad": 144,
+      "acos": "24.57%",
+      "tacos": "302.38%",
+      "margin": "0.00%",
+      "bsr": "Butt Terminals：641",
+      "cvr": "1.54%",
+      "ret": "0.00%",
+      "ncvr": "-125.00%",
+      "acvr": "19.30%",
+      "pf": -176,
+      "fba": 0,
+      "cogs": 0
+    }
+  ],
+  "alerts": [
+    {
+      "l": "red",
+      "t": "HX1045(BHT盒装-330pcs) - 销量大但亏损",
+      "d": "月销1,870单 · 销售额$49,036 · 广告费$12,242 · TACoS 24.82% · 毛利率-4.39%"
+    },
+    {
+      "l": "red",
+      "t": "HX2089(BHT-蓝黄盒子-420pcs) - 几乎无单但广告持续烧钱",
+      "d": "月销4单 · 广告费$95 · 建议立即暂停广告排查"
+    },
+    {
+      "l": "red",
+      "t": "HX2090(BHT-蓝黄盒子-520pcs) - 几乎无单但广告持续烧钱",
+      "d": "月销0单 · 广告费$144 · 建议立即暂停广告排查"
+    }
+  ],
+  "cost": {
+    "labels": [
+      "平台佣金",
+      "FBA配送费",
+      "广告费",
+      "采购成本",
+      "头程成本",
+      "仓储+配置",
+      "促销折扣",
+      "退款",
+      "净利润"
+    ],
+    "values": [
+      21839,
+      29852,
+      23408,
+      52124,
+      3876,
+      1607,
+      2575,
+      1917,
+      11146
+    ]
+  }
+};
+var WEEKLY_DATA = {
+  "weeks": {
+    "2026_18": {
+      "year": 2026,
+      "month": 5,
+      "week": 18,
+      "dateRange": "2026-05-01 ~ 2026-05-03",
+      "total": {
+        "margin": 6.81,
+        "target": 8.0,
+        "sales": 15175,
+        "ad": 3186,
+        "tacos": 21.0,
+        "orders": 570,
+        "profit": 1033,
+        "gap": 181
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 347,
+          "s": 9755,
+          "ad": 1852,
+          "pf": 474,
+          "margin": 4.86,
+          "tacos": 18.98
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 191,
+          "s": 3988,
+          "ad": 952,
+          "pf": 187,
+          "margin": 4.69,
+          "tacos": 23.87
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 32,
+          "s": 1431,
+          "ad": 381,
+          "pf": 380,
+          "margin": 26.58,
+          "tacos": 26.63
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 0,
+          "s": 0,
+          "ad": 1,
+          "pf": -8,
+          "margin": 0,
+          "tacos": 0
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 229,
+          "s": 6544,
+          "ad": 1643,
+          "pf": -228,
+          "margin": "-3.48%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 74,
+          "s": 1560,
+          "ad": 439,
+          "pf": -113,
+          "margin": "-7.25%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 69,
+          "s": 1439,
+          "ad": 313,
+          "pf": 139,
+          "margin": "9.64%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 43,
+          "s": 873,
+          "ad": 199,
+          "pf": 29,
+          "margin": "3.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 21,
+          "s": 771,
+          "ad": 46,
+          "pf": 138,
+          "margin": "17.86%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 11,
+          "s": 705,
+          "ad": 0,
+          "pf": 147,
+          "margin": "20.90%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 12,
+          "s": 647,
+          "ad": 149,
+          "pf": 46,
+          "margin": "7.05%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 12,
+          "s": 474,
+          "ad": 151,
+          "pf": 184,
+          "margin": "38.93%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 20,
+          "s": 458,
+          "ad": 86,
+          "pf": 132,
+          "margin": "28.77%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 25,
+          "s": 458,
+          "ad": 17,
+          "pf": 66,
+          "margin": "14.34%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 33,
+          "s": 424,
+          "ad": 50,
+          "pf": 146,
+          "margin": "34.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 8,
+          "s": 395,
+          "ad": 9,
+          "pf": 73,
+          "margin": "18.59%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 171,
+          "ad": 77,
+          "pf": 51,
+          "margin": "29.86%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 5,
+          "s": 116,
+          "ad": 1,
+          "pf": 20,
+          "margin": "17.50%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 73,
+          "ad": 3,
+          "pf": 37,
+          "margin": "50.37%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 66,
+          "ad": 0,
+          "pf": 13,
+          "margin": "18.98%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": 112,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": 50,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -1,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -2,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -4,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 1,
+          "pf": -2,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_19": {
+      "year": 2026,
+      "month": 5,
+      "week": 19,
+      "dateRange": "2026-05-04 ~ 2026-05-10",
+      "total": {
+        "margin": 10.77,
+        "target": 8.0,
+        "sales": 44156,
+        "ad": 7383,
+        "tacos": 16.72,
+        "orders": 1574,
+        "profit": 4755,
+        "gap": -1222
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 907,
+          "s": 26018,
+          "ad": 4485,
+          "pf": 2466,
+          "margin": 9.48,
+          "tacos": 17.24
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 531,
+          "s": 11896,
+          "ad": 2029,
+          "pf": 1035,
+          "margin": 8.7,
+          "tacos": 17.05
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 135,
+          "s": 6182,
+          "ad": 866,
+          "pf": 1316,
+          "margin": 21.28,
+          "tacos": 14.01
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 1,
+          "s": 60,
+          "ad": 3,
+          "pf": -62,
+          "margin": -102.68,
+          "tacos": 4.92
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 569,
+          "s": 16730,
+          "ad": 3787,
+          "pf": 790,
+          "margin": "4.72%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 200,
+          "s": 4582,
+          "ad": 938,
+          "pf": 74,
+          "margin": "1.62%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 170,
+          "s": 3858,
+          "ad": 610,
+          "pf": 419,
+          "margin": "10.87%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 134,
+          "s": 2852,
+          "ad": 474,
+          "pf": 227,
+          "margin": "7.95%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 62,
+          "s": 2661,
+          "ad": 354,
+          "pf": 429,
+          "margin": "16.10%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 46,
+          "s": 1984,
+          "ad": 353,
+          "pf": 340,
+          "margin": "17.14%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 27,
+          "s": 1951,
+          "ad": 75,
+          "pf": 323,
+          "margin": "16.54%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 47,
+          "s": 1790,
+          "ad": 109,
+          "pf": 410,
+          "margin": "22.92%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 83,
+          "s": 1760,
+          "ad": 377,
+          "pf": 125,
+          "margin": "7.12%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 110,
+          "s": 1527,
+          "ad": 110,
+          "pf": 249,
+          "margin": "16.31%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 18,
+          "s": 1345,
+          "ad": 15,
+          "pf": 306,
+          "margin": "22.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 53,
+          "s": 916,
+          "ad": 12,
+          "pf": 263,
+          "margin": "28.69%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 15,
+          "s": 579,
+          "ad": 156,
+          "pf": 65,
+          "margin": "11.22%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 20,
+          "s": 396,
+          "ad": 3,
+          "pf": 118,
+          "margin": "29.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 385,
+          "ad": 2,
+          "pf": 79,
+          "margin": "20.60%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 269,
+          "ad": 0,
+          "pf": 175,
+          "margin": "65.09%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 7,
+          "s": 208,
+          "ad": 5,
+          "pf": 196,
+          "margin": "94.21%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 162,
+          "ad": 0,
+          "pf": 122,
+          "margin": "75.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 142,
+          "ad": 1,
+          "pf": 105,
+          "margin": "74.12%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 60,
+          "ad": 3,
+          "pf": 33,
+          "margin": "55.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -4,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -91,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_20": {
+      "year": 2026,
+      "month": 5,
+      "week": 20,
+      "dateRange": "2026-05-11 ~ 2026-05-17",
+      "total": {
+        "margin": 5.2,
+        "target": 8.0,
+        "sales": 48820,
+        "ad": 7896,
+        "tacos": 16.17,
+        "orders": 1914,
+        "profit": 2539,
+        "gap": 1367
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 1303,
+          "s": 31947,
+          "ad": 5218,
+          "pf": 1303,
+          "margin": 4.08,
+          "tacos": 16.33
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 497,
+          "s": 11666,
+          "ad": 1840,
+          "pf": 531,
+          "margin": 4.55,
+          "tacos": 15.77
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 114,
+          "s": 5207,
+          "ad": 829,
+          "pf": 695,
+          "margin": 13.35,
+          "tacos": 15.92
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 0,
+          "s": 0,
+          "ad": 9,
+          "pf": 10,
+          "margin": 0,
+          "tacos": 0
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 824,
+          "s": 20695,
+          "ad": 3888,
+          "pf": -247,
+          "margin": "-1.19%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 183,
+          "s": 4385,
+          "ad": 872,
+          "pf": 29,
+          "margin": "0.66%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 181,
+          "s": 4051,
+          "ad": 506,
+          "pf": 388,
+          "margin": "9.58%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 142,
+          "s": 2694,
+          "ad": 722,
+          "pf": -318,
+          "margin": "-11.81%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 111,
+          "s": 2554,
+          "ad": 445,
+          "pf": 0,
+          "margin": "-0.01%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 43,
+          "s": 2381,
+          "ad": 84,
+          "pf": 335,
+          "margin": "14.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 56,
+          "s": 2137,
+          "ad": 132,
+          "pf": 343,
+          "margin": "16.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 45,
+          "s": 1859,
+          "ad": 303,
+          "pf": 38,
+          "margin": "2.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 40,
+          "s": 1633,
+          "ad": 343,
+          "pf": 285,
+          "margin": "17.48%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 36,
+          "s": 1529,
+          "ad": 170,
+          "pf": 568,
+          "margin": "37.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 124,
+          "s": 1387,
+          "ad": 122,
+          "pf": 352,
+          "margin": "25.40%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 78,
+          "s": 1125,
+          "ad": 99,
+          "pf": 269,
+          "margin": "23.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 523,
+          "ad": 1,
+          "pf": 168,
+          "margin": "32.10%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 13,
+          "s": 470,
+          "ad": 173,
+          "pf": 2,
+          "margin": "0.34%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 12,
+          "s": 355,
+          "ad": 15,
+          "pf": 21,
+          "margin": "5.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 355,
+          "ad": 0,
+          "pf": -1,
+          "margin": "-0.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 10,
+          "s": 320,
+          "ad": 2,
+          "pf": 93,
+          "margin": "29.09%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 206,
+          "ad": 0,
+          "pf": 172,
+          "margin": "83.53%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 160,
+          "ad": 8,
+          "pf": 30,
+          "margin": "18.66%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 2,
+          "pf": -6,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -9,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 7,
+          "pf": 24,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_21": {
+      "year": 2026,
+      "month": 5,
+      "week": 21,
+      "dateRange": "2026-05-18 ~ 2026-05-24",
+      "total": {
+        "margin": 8.57,
+        "target": 8.0,
+        "sales": 46139,
+        "ad": 7191,
+        "tacos": 15.59,
+        "orders": 1541,
+        "profit": 3955,
+        "gap": -264
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 913,
+          "s": 24839,
+          "ad": 4709,
+          "pf": 1454,
+          "margin": 5.85,
+          "tacos": 18.96
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 491,
+          "s": 14098,
+          "ad": 1727,
+          "pf": 1659,
+          "margin": 11.77,
+          "tacos": 12.25
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 137,
+          "s": 7202,
+          "ad": 751,
+          "pf": 852,
+          "margin": 11.83,
+          "tacos": 10.43
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 0,
+          "s": 0,
+          "ad": 4,
+          "pf": -11,
+          "margin": 0,
+          "tacos": 0
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 519,
+          "s": 15146,
+          "ad": 3773,
+          "pf": -261,
+          "margin": "-1.72%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 191,
+          "s": 5468,
+          "ad": 809,
+          "pf": 474,
+          "margin": "8.68%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 159,
+          "s": 4511,
+          "ad": 487,
+          "pf": 774,
+          "margin": "17.15%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 126,
+          "s": 2660,
+          "ad": 588,
+          "pf": -59,
+          "margin": "-2.21%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 112,
+          "s": 2602,
+          "ad": 405,
+          "pf": 354,
+          "margin": "13.62%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 51,
+          "s": 2279,
+          "ad": 315,
+          "pf": 218,
+          "margin": "9.57%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 44,
+          "s": 1990,
+          "ad": 304,
+          "pf": 246,
+          "margin": "12.35%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 126,
+          "s": 1656,
+          "ad": 114,
+          "pf": 311,
+          "margin": "18.79%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 41,
+          "s": 1574,
+          "ad": 105,
+          "pf": 470,
+          "margin": "29.88%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 21,
+          "s": 1540,
+          "ad": 8,
+          "pf": 466,
+          "margin": "30.30%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 29,
+          "s": 1402,
+          "ad": 107,
+          "pf": 274,
+          "margin": "19.55%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 18,
+          "s": 1144,
+          "ad": 21,
+          "pf": -22,
+          "margin": "-1.89%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 867,
+          "ad": 1,
+          "pf": 136,
+          "margin": "15.70%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 51,
+          "s": 861,
+          "ad": 14,
+          "pf": 252,
+          "margin": "29.28%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 18,
+          "s": 860,
+          "ad": 130,
+          "pf": 32,
+          "margin": "3.72%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 7,
+          "s": 601,
+          "ad": 1,
+          "pf": 116,
+          "margin": "19.23%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 11,
+          "s": 374,
+          "ad": 4,
+          "pf": 78,
+          "margin": "20.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 343,
+          "ad": 0,
+          "pf": 8,
+          "margin": "2.34%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 7,
+          "s": 261,
+          "ad": 0,
+          "pf": 96,
+          "margin": "36.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 2,
+          "pf": -8,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -17,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 2,
+          "pf": 14,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_22": {
+      "year": 2026,
+      "month": 5,
+      "week": 22,
+      "dateRange": "2026-05-25 ~ 2026-05-31",
+      "total": {
+        "margin": 7.77,
+        "target": 8.0,
+        "sales": 43776,
+        "ad": 7584,
+        "tacos": 17.32,
+        "orders": 1727,
+        "profit": 3403,
+        "gap": 99
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 1012,
+          "s": 27167,
+          "ad": 4810,
+          "pf": 615,
+          "margin": 2.26,
+          "tacos": 17.71
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 614,
+          "s": 12195,
+          "ad": 1981,
+          "pf": 1467,
+          "margin": 12.03,
+          "tacos": 16.24
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 99,
+          "s": 4297,
+          "ad": 792,
+          "pf": 1338,
+          "margin": 31.14,
+          "tacos": 18.42
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 2,
+          "s": 117,
+          "ad": 1,
+          "pf": -17,
+          "margin": -14.24,
+          "tacos": 0.9
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 577,
+          "s": 16498,
+          "ad": 3818,
+          "pf": -824,
+          "margin": "-4.99%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 232,
+          "s": 4494,
+          "ad": 907,
+          "pf": 261,
+          "margin": "5.81%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 204,
+          "s": 4228,
+          "ad": 562,
+          "pf": 498,
+          "margin": "11.77%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 140,
+          "s": 3123,
+          "ad": 568,
+          "pf": -18,
+          "margin": "-0.59%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 141,
+          "s": 2640,
+          "ad": 478,
+          "pf": 378,
+          "margin": "14.32%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 154,
+          "s": 2065,
+          "ad": 115,
+          "pf": 332,
+          "margin": "16.06%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 29,
+          "s": 2015,
+          "ad": 151,
+          "pf": 162,
+          "margin": "8.06%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 40,
+          "s": 1622,
+          "ad": 314,
+          "pf": 474,
+          "margin": "29.25%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 35,
+          "s": 1512,
+          "ad": 321,
+          "pf": 290,
+          "margin": "19.21%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 38,
+          "s": 1398,
+          "ad": 106,
+          "pf": 349,
+          "margin": "24.95%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 59,
+          "s": 1034,
+          "ad": 35,
+          "pf": 261,
+          "margin": "25.21%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 15,
+          "s": 1033,
+          "ad": 17,
+          "pf": 353,
+          "margin": "34.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 17,
+          "s": 459,
+          "ad": 27,
+          "pf": 213,
+          "margin": "46.35%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 12,
+          "s": 411,
+          "ad": 156,
+          "pf": -48,
+          "margin": "-11.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 20,
+          "s": 374,
+          "ad": 8,
+          "pf": 117,
+          "margin": "31.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 300,
+          "ad": 1,
+          "pf": 185,
+          "margin": "61.73%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 162,
+          "ad": 0,
+          "pf": 35,
+          "margin": "21.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 154,
+          "ad": 0,
+          "pf": 294,
+          "margin": "191.02%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 136,
+          "ad": 0,
+          "pf": 107,
+          "margin": "78.31%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 2,
+          "s": 117,
+          "ad": 1,
+          "pf": -4,
+          "margin": "-3.41%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -4,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -9,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_23": {
+      "year": 2026,
+      "month": 6,
+      "week": 23,
+      "dateRange": "2026-06-01 ~ 2026-06-07",
+      "total": {
+        "margin": 9.3,
+        "target": 8.0,
+        "sales": 44212,
+        "ad": 7214,
+        "tacos": 16.32,
+        "orders": 1572,
+        "profit": 4112,
+        "gap": -575
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 915,
+          "s": 25284,
+          "ad": 4854,
+          "pf": 1853,
+          "margin": 7.33,
+          "tacos": 19.2
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 552,
+          "s": 13799,
+          "ad": 1576,
+          "pf": 1439,
+          "margin": 10.43,
+          "tacos": 11.42
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 103,
+          "s": 5016,
+          "ad": 783,
+          "pf": 819,
+          "margin": 16.32,
+          "tacos": 15.61
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 2,
+          "s": 114,
+          "ad": 2,
+          "pf": 2,
+          "margin": 1.72,
+          "tacos": 1.67
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 498,
+          "s": 14769,
+          "ad": 3776,
+          "pf": 196,
+          "margin": "1.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 203,
+          "s": 4936,
+          "ad": 695,
+          "pf": -162,
+          "margin": "-3.29%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 183,
+          "s": 4542,
+          "ad": 484,
+          "pf": 910,
+          "margin": "20.04%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 127,
+          "s": 3180,
+          "ad": 362,
+          "pf": 233,
+          "margin": "7.34%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 126,
+          "s": 2781,
+          "ad": 599,
+          "pf": 133,
+          "margin": "4.80%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 31,
+          "s": 2154,
+          "ad": 24,
+          "pf": 286,
+          "margin": "13.29%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 40,
+          "s": 1960,
+          "ad": 308,
+          "pf": 154,
+          "margin": "7.85%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 138,
+          "s": 1864,
+          "ad": 117,
+          "pf": 490,
+          "margin": "26.27%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 32,
+          "s": 1587,
+          "ad": 145,
+          "pf": 271,
+          "margin": "17.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 32,
+          "s": 1277,
+          "ad": 340,
+          "pf": 214,
+          "margin": "16.77%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 29,
+          "s": 1132,
+          "ad": 106,
+          "pf": 284,
+          "margin": "25.12%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 61,
+          "s": 999,
+          "ad": 88,
+          "pf": 191,
+          "margin": "19.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 28,
+          "s": 904,
+          "ad": 30,
+          "pf": 397,
+          "margin": "43.91%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 15,
+          "s": 516,
+          "ad": 134,
+          "pf": 107,
+          "margin": "20.65%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 424,
+          "ad": 0,
+          "pf": -19,
+          "margin": "-4.59%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 6,
+          "s": 406,
+          "ad": 1,
+          "pf": 90,
+          "margin": "22.27%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 300,
+          "ad": 0,
+          "pf": 157,
+          "margin": "52.40%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 11,
+          "s": 237,
+          "ad": 6,
+          "pf": 60,
+          "margin": "25.47%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 132,
+          "ad": 0,
+          "pf": 116,
+          "margin": "87.56%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 2,
+          "s": 114,
+          "ad": 1,
+          "pf": 16,
+          "margin": "13.78%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 1,
+          "pf": -5,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -9,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_24": {
+      "year": 2026,
+      "month": 6,
+      "week": 24,
+      "dateRange": "2026-06-08 ~ 2026-06-14",
+      "total": {
+        "margin": 11.15,
+        "target": 8.0,
+        "sales": 42122,
+        "ad": 6806,
+        "tacos": 16.16,
+        "orders": 1560,
+        "profit": 4698,
+        "gap": -1329
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 957,
+          "s": 25030,
+          "ad": 4612,
+          "pf": 1934,
+          "margin": 7.72,
+          "tacos": 18.43
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 490,
+          "s": 11653,
+          "ad": 1578,
+          "pf": 1931,
+          "margin": 16.57,
+          "tacos": 13.54
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 110,
+          "s": 5250,
+          "ad": 612,
+          "pf": 804,
+          "margin": 15.31,
+          "tacos": 11.66
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 3,
+          "s": 189,
+          "ad": 4,
+          "pf": 30,
+          "margin": 16.11,
+          "tacos": 2.28
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 551,
+          "s": 15035,
+          "ad": 3679,
+          "pf": -513,
+          "margin": "-3.41%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 170,
+          "s": 4211,
+          "ad": 721,
+          "pf": 186,
+          "margin": "4.41%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 156,
+          "s": 3614,
+          "ad": 450,
+          "pf": 1115,
+          "margin": "30.85%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 127,
+          "s": 2771,
+          "ad": 383,
+          "pf": 400,
+          "margin": "14.44%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 107,
+          "s": 2288,
+          "ad": 526,
+          "pf": 389,
+          "margin": "17.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 41,
+          "s": 2015,
+          "ad": 260,
+          "pf": 238,
+          "margin": "11.82%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 48,
+          "s": 1901,
+          "ad": 77,
+          "pf": 337,
+          "margin": "17.71%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 26,
+          "s": 1664,
+          "ad": 41,
+          "pf": 461,
+          "margin": "27.71%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 38,
+          "s": 1598,
+          "ad": 237,
+          "pf": 222,
+          "margin": "13.88%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 126,
+          "s": 1597,
+          "ad": 95,
+          "pf": 532,
+          "margin": "33.28%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 28,
+          "s": 1365,
+          "ad": 146,
+          "pf": 486,
+          "margin": "35.62%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 71,
+          "s": 1180,
+          "ad": 47,
+          "pf": 242,
+          "margin": "20.52%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 24,
+          "s": 760,
+          "ad": 22,
+          "pf": 227,
+          "margin": "29.92%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 16,
+          "s": 621,
+          "ad": 116,
+          "pf": 71,
+          "margin": "11.39%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 442,
+          "ad": 0,
+          "pf": 87,
+          "margin": "19.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 377,
+          "ad": 0,
+          "pf": 45,
+          "margin": "11.85%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 13,
+          "s": 297,
+          "ad": 2,
+          "pf": 3,
+          "margin": "0.86%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 130,
+          "ad": 0,
+          "pf": 25,
+          "margin": "19.29%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 111,
+          "ad": 2,
+          "pf": 45,
+          "margin": "40.69%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 2,
+          "s": 78,
+          "ad": 2,
+          "pf": -6,
+          "margin": "-7.60%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 66,
+          "ad": 0,
+          "pf": 116,
+          "margin": "174.19%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -9,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_25": {
+      "year": 2026,
+      "month": 6,
+      "week": 25,
+      "dateRange": "2026-06-15 ~ 2026-06-21",
+      "total": {
+        "margin": 5.03,
+        "target": 8.0,
+        "sales": 39755,
+        "ad": 6573,
+        "tacos": 16.53,
+        "orders": 1429,
+        "profit": 2000,
+        "gap": 1180
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 841,
+          "s": 23134,
+          "ad": 4502,
+          "pf": 1569,
+          "margin": 6.78,
+          "tacos": 19.46
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 489,
+          "s": 12078,
+          "ad": 1598,
+          "pf": -185,
+          "margin": -1.53,
+          "tacos": 13.23
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 98,
+          "s": 4503,
+          "ad": 472,
+          "pf": 674,
+          "margin": 14.97,
+          "tacos": 10.48
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 1,
+          "s": 40,
+          "ad": 2,
+          "pf": -59,
+          "margin": -146.84,
+          "tacos": 3.88
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 475,
+          "s": 13813,
+          "ad": 3705,
+          "pf": -360,
+          "margin": "-2.61%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 191,
+          "s": 4852,
+          "ad": 759,
+          "pf": -230,
+          "margin": "-4.74%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 164,
+          "s": 3809,
+          "ad": 432,
+          "pf": -113,
+          "margin": "-2.98%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 119,
+          "s": 2730,
+          "ad": 401,
+          "pf": 106,
+          "margin": "3.89%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 104,
+          "s": 2377,
+          "ad": 368,
+          "pf": 172,
+          "margin": "7.22%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 50,
+          "s": 1901,
+          "ad": 76,
+          "pf": 347,
+          "margin": "18.25%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 40,
+          "s": 1735,
+          "ad": 202,
+          "pf": 246,
+          "margin": "14.17%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 32,
+          "s": 1425,
+          "ad": 209,
+          "pf": 171,
+          "margin": "12.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 22,
+          "s": 1420,
+          "ad": 74,
+          "pf": 492,
+          "margin": "34.63%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 90,
+          "s": 1159,
+          "ad": 74,
+          "pf": 377,
+          "margin": "32.54%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 66,
+          "s": 1121,
+          "ad": 56,
+          "pf": 178,
+          "margin": "15.84%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 19,
+          "s": 989,
+          "ad": 117,
+          "pf": 430,
+          "margin": "43.46%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 21,
+          "s": 705,
+          "ad": 32,
+          "pf": -2,
+          "margin": "-0.24%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 6,
+          "s": 409,
+          "ad": 0,
+          "pf": 47,
+          "margin": "11.47%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 11,
+          "s": 380,
+          "ad": 60,
+          "pf": -37,
+          "margin": "-9.70%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 9,
+          "s": 334,
+          "ad": 7,
+          "pf": -11,
+          "margin": "-3.36%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 304,
+          "ad": 0,
+          "pf": 77,
+          "margin": "25.23%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 154,
+          "ad": 0,
+          "pf": 115,
+          "margin": "74.59%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 96,
+          "ad": 0,
+          "pf": 55,
+          "margin": "58.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 40,
+          "ad": 0,
+          "pf": -8,
+          "margin": "-20.18%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -39,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 2,
+          "pf": -12,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_26": {
+      "year": 2026,
+      "month": 6,
+      "week": 26,
+      "dateRange": "2026-06-22 ~ 2026-06-28",
+      "total": {
+        "margin": 11.57,
+        "target": 8.0,
+        "sales": 46500,
+        "ad": 5829,
+        "tacos": 12.54,
+        "orders": 1928,
+        "profit": 5382,
+        "gap": -1662
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 1123,
+          "s": 26800,
+          "ad": 3817,
+          "pf": 2812,
+          "margin": 10.49,
+          "tacos": 14.24
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 699,
+          "s": 15314,
+          "ad": 1601,
+          "pf": 1430,
+          "margin": 9.33,
+          "tacos": 10.45
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 103,
+          "s": 4258,
+          "ad": 400,
+          "pf": 1159,
+          "margin": 27.22,
+          "tacos": 9.39
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 3,
+          "s": 128,
+          "ad": 12,
+          "pf": -18,
+          "margin": -13.89,
+          "tacos": 9.54
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 628,
+          "s": 15673,
+          "ad": 2943,
+          "pf": 656,
+          "margin": "4.18%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 257,
+          "s": 5796,
+          "ad": 735,
+          "pf": 69,
+          "margin": "1.19%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 241,
+          "s": 5186,
+          "ad": 439,
+          "pf": 717,
+          "margin": "13.83%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 153,
+          "s": 3062,
+          "ad": 378,
+          "pf": 304,
+          "margin": "9.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 148,
+          "s": 2870,
+          "ad": 369,
+          "pf": 404,
+          "margin": "14.06%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 35,
+          "s": 2159,
+          "ad": 107,
+          "pf": 327,
+          "margin": "15.12%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 58,
+          "s": 1807,
+          "ad": 73,
+          "pf": 501,
+          "margin": "27.73%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 40,
+          "s": 1615,
+          "ad": 158,
+          "pf": 497,
+          "margin": "30.76%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 38,
+          "s": 1510,
+          "ad": 175,
+          "pf": 119,
+          "margin": "7.89%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 129,
+          "s": 1474,
+          "ad": 112,
+          "pf": 304,
+          "margin": "20.64%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 32,
+          "s": 1446,
+          "ad": 126,
+          "pf": 304,
+          "margin": "21.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 93,
+          "s": 1370,
+          "ad": 87,
+          "pf": 317,
+          "margin": "23.13%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 32,
+          "s": 918,
+          "ad": 47,
+          "pf": 254,
+          "margin": "27.71%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 14,
+          "s": 545,
+          "ad": 63,
+          "pf": 115,
+          "margin": "21.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 16,
+          "s": 352,
+          "ad": 2,
+          "pf": 85,
+          "margin": "24.14%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 6,
+          "s": 179,
+          "ad": 0,
+          "pf": 38,
+          "margin": "21.13%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 3,
+          "s": 178,
+          "ad": 1,
+          "pf": 124,
+          "margin": "69.46%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 154,
+          "ad": 0,
+          "pf": 158,
+          "margin": "102.70%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 2,
+          "s": 96,
+          "ad": 4,
+          "pf": -7,
+          "margin": "-7.65%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 77,
+          "ad": 2,
+          "pf": 108,
+          "margin": "140.73%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 32,
+          "ad": 8,
+          "pf": -2,
+          "margin": "-5.50%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -9,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_27": {
+      "year": 2026,
+      "month": 6,
+      "week": 27,
+      "dateRange": "2026-06-29 ~ 2026-07-05",
+      "total": {
+        "margin": 9.0,
+        "target": 8.0,
+        "sales": 33005,
+        "ad": 6112,
+        "tacos": 18.52,
+        "orders": 1212,
+        "profit": 2969,
+        "gap": -329
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 700,
+          "s": 18654,
+          "ad": 4009,
+          "pf": 732,
+          "margin": 3.92,
+          "tacos": 21.49
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 426,
+          "s": 10164,
+          "ad": 1724,
+          "pf": 1595,
+          "margin": 15.69,
+          "tacos": 16.97
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 85,
+          "s": 4129,
+          "ad": 377,
+          "pf": 637,
+          "margin": 15.42,
+          "tacos": 9.13
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 1,
+          "s": 57,
+          "ad": 1,
+          "pf": 5,
+          "margin": 9.14,
+          "tacos": 1.6
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 379,
+          "s": 10743,
+          "ad": 3181,
+          "pf": -857,
+          "margin": "-7.97%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 161,
+          "s": 4055,
+          "ad": 822,
+          "pf": 527,
+          "margin": "13.01%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 152,
+          "s": 3362,
+          "ad": 467,
+          "pf": 593,
+          "margin": "17.63%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 108,
+          "s": 2319,
+          "ad": 427,
+          "pf": 244,
+          "margin": "10.54%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 88,
+          "s": 2027,
+          "ad": 391,
+          "pf": 273,
+          "margin": "13.47%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 31,
+          "s": 1504,
+          "ad": 152,
+          "pf": 151,
+          "margin": "10.04%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 42,
+          "s": 1500,
+          "ad": 72,
+          "pf": 459,
+          "margin": "30.57%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 33,
+          "s": 1438,
+          "ad": 158,
+          "pf": 315,
+          "margin": "21.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 20,
+          "s": 1122,
+          "ad": 109,
+          "pf": 111,
+          "margin": "9.85%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 15,
+          "s": 1017,
+          "ad": 87,
+          "pf": 247,
+          "margin": "24.31%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 79,
+          "s": 1011,
+          "ad": 88,
+          "pf": 226,
+          "margin": "22.35%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 57,
+          "s": 942,
+          "ad": 46,
+          "pf": 302,
+          "margin": "32.03%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 15,
+          "s": 523,
+          "ad": 35,
+          "pf": 149,
+          "margin": "28.51%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 14,
+          "s": 511,
+          "ad": 64,
+          "pf": 20,
+          "margin": "3.97%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 323,
+          "ad": 0,
+          "pf": 24,
+          "margin": "7.49%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 215,
+          "ad": 0,
+          "pf": 57,
+          "margin": "26.69%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 10,
+          "s": 198,
+          "ad": 9,
+          "pf": 53,
+          "margin": "26.81%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 1,
+          "s": 73,
+          "ad": 2,
+          "pf": 45,
+          "margin": "61.25%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 2,
+          "s": 66,
+          "ad": 0,
+          "pf": 24,
+          "margin": "36.13%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 57,
+          "ad": 1,
+          "pf": 18,
+          "margin": "30.87%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -4,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 0,
+          "pf": -8,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_28": {
+      "year": 2026,
+      "month": 7,
+      "week": 28,
+      "dateRange": "2026-07-06 ~ 2026-07-12",
+      "total": {
+        "margin": 2.57,
+        "target": 8.0,
+        "sales": 37951,
+        "ad": 6439,
+        "tacos": 16.97,
+        "orders": 1359,
+        "profit": 974,
+        "gap": 2062
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 800,
+          "s": 22293,
+          "ad": 4335,
+          "pf": -868,
+          "margin": -3.89,
+          "tacos": 19.45
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 457,
+          "s": 10877,
+          "ad": 1623,
+          "pf": 1088,
+          "margin": 10.0,
+          "tacos": 14.92
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 99,
+          "s": 4648,
+          "ad": 397,
+          "pf": 810,
+          "margin": 17.43,
+          "tacos": 8.55
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 3,
+          "s": 133,
+          "ad": 84,
+          "pf": -56,
+          "margin": -42.39,
+          "tacos": 63.24
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 479,
+          "s": 13796,
+          "ad": 3467,
+          "pf": -1703,
+          "margin": "-12.34%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 174,
+          "s": 4078,
+          "ad": 526,
+          "pf": 648,
+          "margin": "15.89%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 156,
+          "s": 3846,
+          "ad": 650,
+          "pf": 77,
+          "margin": "2.01%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 107,
+          "s": 2363,
+          "ad": 421,
+          "pf": 8,
+          "margin": "0.32%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 98,
+          "s": 2225,
+          "ad": 418,
+          "pf": 137,
+          "margin": "6.17%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 25,
+          "s": 1786,
+          "ad": 116,
+          "pf": 39,
+          "margin": "2.18%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 42,
+          "s": 1587,
+          "ad": 82,
+          "pf": 221,
+          "margin": "13.92%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 32,
+          "s": 1518,
+          "ad": 170,
+          "pf": 201,
+          "margin": "13.23%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 31,
+          "s": 1321,
+          "ad": 158,
+          "pf": 275,
+          "margin": "20.85%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 81,
+          "s": 1063,
+          "ad": 80,
+          "pf": 127,
+          "margin": "11.99%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 51,
+          "s": 866,
+          "ad": 50,
+          "pf": 242,
+          "margin": "27.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 15,
+          "s": 832,
+          "ad": 118,
+          "pf": 198,
+          "margin": "23.75%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 17,
+          "s": 614,
+          "ad": 67,
+          "pf": 40,
+          "margin": "6.47%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 15,
+          "s": 462,
+          "ad": 27,
+          "pf": 176,
+          "margin": "38.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 6,
+          "s": 454,
+          "ad": 0,
+          "pf": 44,
+          "margin": "9.64%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 308,
+          "ad": 1,
+          "pf": 56,
+          "margin": "18.30%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 273,
+          "ad": 2,
+          "pf": 165,
+          "margin": "60.33%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 14,
+          "s": 267,
+          "ad": 2,
+          "pf": 50,
+          "margin": "18.64%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 160,
+          "ad": 0,
+          "pf": 29,
+          "margin": "18.32%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 2,
+          "s": 76,
+          "ad": 30,
+          "pf": -20,
+          "margin": "-26.36%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 57,
+          "ad": 27,
+          "pf": -1,
+          "margin": "-1.07%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 27,
+          "pf": -36,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    },
+    "2026_29": {
+      "year": 2026,
+      "month": 7,
+      "week": 29,
+      "dateRange": "2026-07-13 ~ 2026-07-19",
+      "total": {
+        "margin": 7.99,
+        "target": 8.0,
+        "sales": 38339,
+        "ad": 6511,
+        "tacos": 16.98,
+        "orders": 1351,
+        "profit": 3061,
+        "gap": 6
+      },
+      "parents": {
+        "B09N9815DF": {
+          "name": "330BHT(盒装)",
+          "n": 7,
+          "o": 726,
+          "s": 20057,
+          "ad": 4311,
+          "pf": 1009,
+          "margin": 5.03,
+          "tacos": 21.49
+        },
+        "B0C3QMWY9K": {
+          "name": "瓶装BHT",
+          "n": 5,
+          "o": 521,
+          "s": 12757,
+          "ad": 1648,
+          "pf": 1258,
+          "margin": 9.86,
+          "tacos": 12.92
+        },
+        "B09G9RL5D3": {
+          "name": "袋装BHT",
+          "n": 7,
+          "o": 102,
+          "s": 5392,
+          "ad": 437,
+          "pf": 915,
+          "margin": 16.97,
+          "tacos": 8.11
+        },
+        "B0FN7BFHQY": {
+          "name": "蓝黄BHT",
+          "n": 3,
+          "o": 2,
+          "s": 134,
+          "ad": 114,
+          "pf": -121,
+          "margin": -90.68,
+          "tacos": 85.59
+        }
+      },
+      "skus": [
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1045",
+          "name": "BHT盒装",
+          "o": 416,
+          "s": 12067,
+          "ad": 3444,
+          "pf": -248,
+          "margin": "-2.05%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1026",
+          "name": "BHT瓶装",
+          "o": 180,
+          "s": 4518,
+          "ad": 488,
+          "pf": 577,
+          "margin": "12.77%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1025",
+          "name": "BHT瓶装",
+          "o": 185,
+          "s": 4506,
+          "ad": 725,
+          "pf": 310,
+          "margin": "6.88%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1027",
+          "name": "BHT瓶装",
+          "o": 117,
+          "s": 2711,
+          "ad": 400,
+          "pf": 216,
+          "margin": "7.95%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1053",
+          "name": "BHT盒装",
+          "o": 105,
+          "s": 2334,
+          "ad": 448,
+          "pf": -45,
+          "margin": "-1.94%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1234",
+          "name": "BHT袋装",
+          "o": 38,
+          "s": 1737,
+          "ad": 217,
+          "pf": 304,
+          "margin": "17.51%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1599",
+          "name": "BHT盒装",
+          "o": 28,
+          "s": 1668,
+          "ad": 112,
+          "pf": 177,
+          "margin": "10.61%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1233",
+          "name": "BHT袋装",
+          "o": 33,
+          "s": 1509,
+          "ad": 155,
+          "pf": 170,
+          "margin": "11.25%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1822",
+          "name": "BHT盒装",
+          "o": 39,
+          "s": 1463,
+          "ad": 73,
+          "pf": 368,
+          "margin": "25.18%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1821",
+          "name": "BHT盒装",
+          "o": 61,
+          "s": 1033,
+          "ad": 55,
+          "pf": 115,
+          "margin": "11.11%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1820",
+          "name": "BHT盒装",
+          "o": 69,
+          "s": 982,
+          "ad": 73,
+          "pf": 236,
+          "margin": "24.04%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1614",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 712,
+          "ad": 0,
+          "pf": 74,
+          "margin": "10.45%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1046",
+          "name": "BHT瓶装",
+          "o": 18,
+          "s": 586,
+          "ad": 34,
+          "pf": 110,
+          "margin": "18.69%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09N9815DF",
+          "sku": "HX1352",
+          "name": "BHT蓝黄盒子",
+          "o": 8,
+          "s": 510,
+          "ad": 106,
+          "pf": 406,
+          "margin": "79.57%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1236",
+          "name": "BHT袋装",
+          "o": 13,
+          "s": 472,
+          "ad": 65,
+          "pf": 152,
+          "margin": "32.13%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0C3QMWY9K",
+          "sku": "HX1819",
+          "name": "BHT瓶装",
+          "o": 21,
+          "s": 435,
+          "ad": 2,
+          "pf": 46,
+          "margin": "10.67%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1616",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 409,
+          "ad": 0,
+          "pf": 99,
+          "margin": "24.31%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1615",
+          "name": "BHT袋装",
+          "o": 4,
+          "s": 365,
+          "ad": 0,
+          "pf": 68,
+          "margin": "18.63%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B09G9RL5D3",
+          "sku": "HX1235",
+          "name": "BHT袋装",
+          "o": 5,
+          "s": 188,
+          "ad": 0,
+          "pf": 48,
+          "margin": "25.40%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2089",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 74,
+          "ad": 32,
+          "pf": -31,
+          "margin": "-41.52%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2091",
+          "name": "BHT蓝黄盒子",
+          "o": 1,
+          "s": 60,
+          "ad": 21,
+          "pf": -21,
+          "margin": "-35.16%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        },
+        {
+          "p": "B0FN7BFHQY",
+          "sku": "HX2090",
+          "name": "BHT蓝黄盒子",
+          "o": 0,
+          "s": 0,
+          "ad": 61,
+          "pf": -70,
+          "margin": "0.00%",
+          "acos": "N/A",
+          "tacos": "N/A",
+          "bsr": "N/A",
+          "cvr": "N/A",
+          "ret": "N/A"
+        }
+      ]
+    }
+  },
+  "map": {
+    "w07_1": "2026_27",
+    "w07_2": "2026_28",
+    "w07_3": "2026_29"
+  }
+};
+
+var WEEKS = [
+  {id:'w07_1',label:'7月W1',sub:'6/29-7/5',ratio:null,est:false,wkKey:'2026_27'},
+  {id:'w07_2',label:'7月W2',sub:'7/6-7/12',ratio:null,est:false,wkKey:'2026_28'},
+  {id:'w07_3',label:'7月W3',sub:'7/13-7/19',ratio:null,est:false,wkKey:'2026_29'},
+  {id:'w07_4',label:'7月W4',sub:'7/20-7/26',ratio:0.26,est:true,wkKey:'2026_30'},
+  {id:'w07_5',label:'7月W5',sub:'7/27-8/2',ratio:null,est:false,wkKey:null},
+  {id:'w08_1',label:'8月W1',sub:'8/3-8/9',ratio:null,est:false,wkKey:null},
+  {id:'w08_2',label:'8月W2',sub:'8/10-8/16',ratio:null,est:false,wkKey:null},
+  {id:'w08_3',label:'8月W3',sub:'8/17-8/23',ratio:null,est:false,wkKey:null},
+  {id:'w08_4',label:'8月W4',sub:'8/24-8/30',ratio:null,est:false,wkKey:null},
+  {id:'month',label:'7月汇总',sub:'全月真实数据',ratio:1,est:false,wkKey:null},
+];
+
+var curTab = 'month';
+var prioFilter = 'all';
+var todos = JSON.parse(localStorage.getItem('bht_todos')||'[]');
+var DEF_TODOS = [
+  {id:'t1',text:'建立7月利润基线(按ASIN拆解所有成本)',prio:'P0',week:'w07_1',done:false},
+  {id:'t2',text:'广告止损:找出ACoS>30%关键词并降bid/否定',prio:'P0',week:'w07_1',done:false},
+  {id:'t3',text:'竞品价格对比(判断提价空间)',prio:'P1',week:'w07_2',done:false},
+  {id:'t4',text:'库存健康筛查(>180天长期仓储风险)',prio:'P1',week:'w07_2',done:false},
+  {id:'t5',text:'广告结构优化:预算向高转化词集中',prio:'P0',week:'w07_3',done:false},
+  {id:'t6',text:'主力ASIN HX1045涨$0.5-1测试',prio:'P0',week:'w07_3',done:false},
+  {id:'t7',text:'Prime专享折扣设置(4个父ASIN)',prio:'P2',week:'w07_4',done:false},
+  {id:'t8',text:'冗余库存coupon清理',prio:'P1',week:'w07_4',done:false},
+  {id:'t9',text:'22个子ASIN利润率排名分析',prio:'P1',week:'w08_1',done:false},
+  {id:'t10',text:'Listing优化:主图/A+/差评回复',prio:'P0',week:'w08_1',done:false},
+  {id:'t11',text:'入库配置费优化(调整发货仓库)',prio:'P1',week:'w08_2',done:false},
+  {id:'t12',text:'竞品BSR/价格/评分动态更新',prio:'P2',week:'w08_2',done:false},
+  {id:'t13',text:'月末利润精确核算(四ASIN加总)',prio:'P0',week:'w08_3',done:false},
+  {id:'t14',text:'目标达成判断(8% vs 实际)',prio:'P0',week:'w08_3',done:false},
+  {id:'t15',text:'9月初步目标与策略方向制定',prio:'P1',week:'w08_4',done:false},
+  {id:'t16',text:'7月vs8月广告数据月度对比',prio:'P1',week:'w08_4',done:false},
+  {id:'t17',text:'9月补货计划(检查库存覆盖天数)',prio:'P2',week:'w08_4',done:false},
+];
+if(!todos.length){todos=DEF_TODOS;saveTodos()}
+function saveTodos(){localStorage.setItem('bht_todos',JSON.stringify(todos))}
+
+function getWeekData(wk){
+  if(wk.id==='month') return {total:DATA.total,parents:DATA.parents,skus:DATA.skus,alerts:DATA.alerts,cost:DATA.cost};
+
+  // Try real weekly data from source Excel
+  if(wk.wkKey && WEEKLY_DATA.weeks && WEEKLY_DATA.weeks[wk.wkKey]){
+    var wd = WEEKLY_DATA.weeks[wk.wkKey];
+    var alerts=[];
+    (wd.skus||[]).forEach(function(s){
+      var mv=0; try{mv=parseFloat(s.margin)}catch(e){}
+      if(s.o>120&&mv<0) alerts.push({l:'red',t:s.sku+'('+s.name+') - 周销量大但亏损',d:'周销'+s.o.toLocaleString()+'单 $'+s.s.toLocaleString()+' 广告$'+s.ad.toLocaleString()+' 毛利率'+s.margin});
+      else if(s.o<=2&&s.ad>15) alerts.push({l:'red',t:s.sku+'('+s.name+') - 几乎无单广告烧钱',d:'周销'+s.o+'单 广告$'+s.ad.toLocaleString()+' 建议暂停广告排查'});
+    });
+    return {total:wd.total,parents:wd.parents,skus:wd.skus,alerts:alerts,cost:null};
+  }
+
+  // Fall back to proportional estimation
+  if(wk.ratio===null) return null;
+  var r=wk.ratio;
+  var total={margin:DATA.total.margin,target:8.0,sales:Math.round(DATA.total.sales*r),ad:Math.round(DATA.total.ad*r),tacos:DATA.total.tacos,orders:Math.round(DATA.total.orders*r),profit:Math.round(DATA.total.profit*r),gap:Math.round(DATA.total.gap*r)};
+  var parents={};
+  for(var pid in DATA.parents){
+    var p=DATA.parents[pid];
+    parents[pid]={name:p.name,n:p.n,o:Math.round(p.o*r),s:Math.round(p.s*r),ad:Math.round(p.ad*r),pf:Math.round(p.pf*r),margin:p.margin,tacos:p.tacos};
+  }
+  var skus=DATA.skus.map(function(s){return {p:s.p,sku:s.sku,name:s.name,o:Math.round(s.o*r),s:Math.round(s.s*r),ad:Math.round(s.ad*r),acos:s.acos,tacos:s.tacos,margin:s.margin,bsr:s.bsr,cvr:s.cvr,ret:s.ret,pf:Math.round(s.pf*r)}});
+  var alerts=[];
+  skus.forEach(function(s){
+    var mv=0;try{mv=parseFloat(s.margin.replace('%',''))}catch(e){}
+    if(s.o>120&&mv<0) alerts.push({l:'red',t:s.sku+'('+s.name+') - 周销量大但亏损',d:'周销'+s.o.toLocaleString()+'单 $'+s.s.toLocaleString()+' 广告$'+s.ad.toLocaleString()+' TACoS '+s.tacos+' 毛利率'+s.margin});
+    else if(s.o<=2&&s.ad>15) alerts.push({l:'red',t:s.sku+'('+s.name+') - 几乎无单广告烧钱',d:'周销'+s.o+'单 广告$'+s.ad.toLocaleString()+' 建议暂停广告排查'});
+  });
+  return {total:total,parents:parents,skus:skus,alerts:alerts,cost:null};
+}
+
+function renderKPI(t, wk){
+  if(!t){document.getElementById('kpiRow').innerHTML='<div class="kpi-card" style="grid-column:1/-1;text-align:center;padding:30px"><div class="val" style="color:#8b90a0;font-size:14px">暂无该周数据</div><div class="sub n">从领星导出该周报表后运行 bht_data/run_pipeline.py 更新</div></div>';return}
+  var g=t.margin>=t.target,g2=t.margin>=t.target-0.3;
+  var note='';
+  if(wk&&wk.est) note='<span style="font-size:10px;color:#f59e0b;margin-left:4px">(估算)</span>';
+  else if(wk&&wk.partial) note='<span style="font-size:10px;color:#3b82f6;margin-left:4px">(真实-5天)</span>';
+  else if(wk&&!wk.est&&wk.id!=='month') note='<span style="font-size:10px;color:#22c55e;margin-left:4px">(真实)</span>';
+  document.getElementById('kpiRow').innerHTML=
+    '<div class="kpi-card"><div class="dot '+(g?'dg':g2?'dy':'dr')+'"></div><div class="lbl">净利率'+note+'</div><div class="val">'+t.margin.toFixed(2)+'%</div><div class="sub '+(g?'g':g2?'y':'r')+'">目标'+t.target+'% '+(g?'已达标':'差'+(t.target-t.margin).toFixed(2)+'pp')+'</div></div>'+
+    '<div class="kpi-card"><div class="dot dg"></div><div class="lbl">销售额'+note+'</div><div class="val">$'+(t.sales/1000).toFixed(0)+'k</div><div class="sub n">'+t.orders.toLocaleString()+'单 22SKU</div></div>'+
+    '<div class="kpi-card"><div class="dot '+(t.tacos>14?'dr':'dg')+'"></div><div class="lbl">广告花费'+note+'</div><div class="val">$'+(t.ad/1000).toFixed(0)+'k</div><div class="sub '+(t.tacos>14?'r':'g')+'">TACoS '+t.tacos.toFixed(1)+'%</div></div>'+
+    '<div class="kpi-card"><div class="dot dy"></div><div class="lbl">净利润'+note+'</div><div class="val">$'+(t.profit/1000).toFixed(0)+'k</div><div class="sub '+(t.gap>0?'y':'g')+'">'+(t.gap>0?'距目标差$'+t.gap.toLocaleString():'超出$'+Math.abs(t.gap).toLocaleString())+'</div></div>'+
+    '<div class="kpi-card"><div class="dot dg"></div><div class="lbl">日均销量'+note+'</div><div class="val">'+Math.round(t.orders/7)+'单</div><div class="sub n">周总'+t.orders.toLocaleString()+'单</div></div>';
+}
+
+var charts={};
+function destroyCharts(){for(var k in charts){if(charts[k])charts[k].destroy()}charts={}}
+function renderCharts(wd){
+  destroyCharts();
+  if(!wd) return;
+  Chart.defaults.color='#8b90a0';Chart.defaults.borderColor='#232638';
+  var pids=['B09N9815DF','B0C3QMWY9K','B09G9RL5D3','B0FN7BFHQY'];
+  var pNames=pids.map(function(id){return wd.parents[id]?wd.parents[id].name:id});
+  var pMargins=pids.map(function(id){return wd.parents[id]?wd.parents[id].margin:0});
+  var pSales=pids.map(function(id){return wd.parents[id]?wd.parents[id].s:0});
+  var pAd=pids.map(function(id){return wd.parents[id]?wd.parents[id].ad:0});
+  var sLabels=wd.skus.map(function(s){return s.name.length>14?s.name.substr(0,13)+'...':s.name});
+  var sMargins=wd.skus.map(function(s){try{return parseFloat(s.margin)}catch(e){return 0}});
+  var sColors=sMargins.map(function(v){return isNaN(v)?'#6b7280':v<0?'#ef4444':v<8?'#f59e0b':v<15?'#3b82f6':'#22c55e'});
+
+  charts.margin=new Chart(document.getElementById('chartMargin'),{type:'bar',data:{labels:pNames,datasets:[{data:pMargins,backgroundColor:pMargins.map(function(v){return v<0?'#ef444488':v<8?'#f59e0b88':'#22c55e88'}),borderColor:pMargins.map(function(v){return v<0?'#ef4444':v<8?'#f59e0b':'#22c55e'}),borderWidth:1.5,borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:function(v){return v+'%'}},grid:{color:'#1e2030'}},x:{grid:{display:false}}}}});
+
+  var costCtx=document.getElementById('chartCost').getContext('2d');
+  if(wd.cost && wd.cost.labels){
+    charts.cost=new Chart(document.getElementById('chartCost'),{type:'doughnut',data:{labels:wd.cost.labels,datasets:[{data:wd.cost.values,backgroundColor:['#6366f1','#8b5cf6','#ef4444','#f59e0b','#3b82f6','#06b6d4','#6b7280','#ef4444','#22c55e'],borderColor:'#161822',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'right',labels:{padding:8,usePointStyle:true,pointStyleWidth:8}}}}});
+  } else {
+    costCtx.clearRect(0,0,costCtx.canvas.width,costCtx.canvas.height);
+    costCtx.font='13px "Microsoft YaHei","PingFang SC",sans-serif';
+    costCtx.fillStyle='#8b90a0';
+    costCtx.textAlign='center';
+    costCtx.fillText('(仅月度汇总含成本拆解)',costCtx.canvas.width/2,costCtx.canvas.height/2);
+  }
+
+  charts.sku=new Chart(document.getElementById('chartSKU'),{type:'bar',data:{labels:sLabels,datasets:[{data:sMargins,backgroundColor:sColors.map(function(c){return c+'88'}),borderColor:sColors,borderWidth:1,borderRadius:4}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:function(v){return v+'%'}},grid:{color:'#1e2030'}},y:{ticks:{font:{size:10}},grid:{display:false}}}}});
+
+  charts.salesAd=new Chart(document.getElementById('chartSalesAd'),{type:'bar',data:{labels:pNames,datasets:[{label:'销售额($)',data:pSales,backgroundColor:'#6366f188',borderColor:'#6366f1',borderWidth:1,borderRadius:6},{label:'广告费($)',data:pAd,backgroundColor:'#ef444488',borderColor:'#ef4444',borderWidth:1,borderRadius:6}]},options:{responsive:true,plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:12}}},scales:{y:{ticks:{callback:function(v){return '$'+(v/1000).toFixed(0)+'k'}},grid:{color:'#1e2030'}},x:{grid:{display:false}}}}});
+}
+
+function renderTable(wd){
+  if(!wd){document.getElementById('skuTbody').innerHTML='';return}
+  var PD={'B09N9815DF':'330BHT(盒装)','B0C3QMWY9K':'瓶装BHT','B09G9RL5D3':'袋装BHT','B0FN7BFHQY':'蓝黄BHT'};
+  var html='',cp='';
+  wd.skus.forEach(function(s){
+    if(s.p!==cp){
+      cp=s.p;
+      var sb=wd.skus.filter(function(r){return r.p===cp});
+      var to=sb.reduce(function(a,r){return a+r.o},0),ts=sb.reduce(function(a,r){return a+r.s},0),ta=sb.reduce(function(a,r){return a+r.ad},0);
+      html+='<tr class="subtot"><td colspan="2"><b>'+cp+'</b> '+PD[cp]+'</td><td style="color:#8b90a0">'+sb.length+'SKU</td><td><b>'+to.toLocaleString()+'</b></td><td><b>$'+ts.toLocaleString()+'</b></td><td><b>$'+ta.toLocaleString()+'</b></td><td colspan="2">TACoS '+(ts>0?(ta/ts*100).toFixed(1):0)+'%</td><td></td><td></td><td></td><td></td><td></td></tr>';
+    }
+    var mv=0;try{mv=parseFloat(s.margin.replace('%',''))}catch(e){}
+    var tg=isNaN(mv)?'tgy':mv<0?'tgr':mv<8?'tgy':'tgg';
+    var ic=isNaN(mv)?'?':mv<0?'!!':'~';
+    html+='<tr><td style="color:#8b90a0;font-size:10px">'+s.p+'</td><td><b>'+s.sku+'</b></td><td>'+s.name+'</td><td>'+s.o.toLocaleString()+'</td><td>$'+s.s.toLocaleString()+'</td><td>$'+s.ad.toLocaleString()+'</td><td>'+(s.acos||'N/A')+'</td><td>'+(s.tacos||'N/A')+'</td><td><span class="tag '+tg+'">'+s.margin+'</span></td><td>'+(s.bsr||'N/A')+'</td><td>'+(s.cvr||'N/A')+'</td><td>'+(s.ret||'N/A')+'</td><td style="color:'+(isNaN(mv)?'#8b90a0':mv<0?'#ef4444':mv<8?'#f59e0b':'#22c55e')+'">'+ic+'</td></tr>';
+  });
+  document.getElementById('skuTbody').innerHTML=html;
+}
+
+function renderAlerts(wd){
+  if(!wd||!wd.alerts||!wd.alerts.length){document.getElementById('alertsSection').innerHTML='';return}
+  var html='<div class="section-title">重点关注</div>';
+  wd.alerts.forEach(function(a){html+='<div class="alert-item'+(a.l==='warn'?' warn':'')+'"><div class="ai">'+(a.l==='red'?'!!':'*')+'</div><div class="alert-body"><div class="at">'+a.t+'</div><div class="ad">'+a.d+'</div></div></div>'});
+  document.getElementById('alertsSection').innerHTML=html;
+}
+
+function renderTodos(){
+  var wkFilter=(curTab==='month'||curTab.indexOf('w08')===0)?'all':curTab;
+  var filtered=todos;
+  if(wkFilter!=='all') filtered=filtered.filter(function(t){return t.week===curTab||t.week==='general'});
+  if(prioFilter!=='all') filtered=filtered.filter(function(t){return t.prio===prioFilter});
+  var tot=filtered.length,done=filtered.filter(function(t){return t.done}).length;
+  var pct=tot>0?Math.round(done/tot*100):0;
+  document.getElementById('todoBar').style.width=pct+'%';
+  document.getElementById('todoStats').innerHTML='共<b>'+tot+'</b>项 | 完成<b>'+done+'</b> | 进度<b>'+pct+'%</b>';
+  var html='';
+  filtered.forEach(function(t){
+    html+='<div class="todo-item'+(t.done?' done':'')+'"><div class="todo-check'+(t.done?' on':'')+'" onclick="toggleTodo(\''+t.id+'\')">'+(t.done?'v':'')+'</div><span class="todo-text" ondblclick="editTodo(\''+t.id+'\')" title="双击编辑">'+t.text+'</span><span class="todo-prio" style="color:'+(t.prio==='P0'?'#ef4444':t.prio==='P1'?'#f59e0b':'#22c55e')+'">'+t.prio+'</span><span class="todo-week">'+(t.week==='general'?'通用':t.week.replace('w07_','7月W').replace('w08_','8月W'))+'</span><button class="todo-del" onclick="deleteTodo(\''+t.id+'\')" title="删除">&times;</button></div>';
+  });
+  if(!html) html='<div style="text-align:center;color:#6b7280;padding:16px">暂无待办，上方添加</div>';
+  document.getElementById('todoList').innerHTML=html;
+}
+function toggleTodo(id){var t=todos.find(function(x){return x.id===id});if(t){t.done=!t.done;saveTodos();renderTodos()}}
+function addTodo(){var tx=document.getElementById('newTodoText').value.trim();if(!tx)return;var p=document.getElementById('newTodoPrio').value;if(p==='all')p='P1';todos.push({id:'t'+Date.now(),text:tx,prio:p,week:document.getElementById('newTodoWeek').value,done:false});saveTodos();renderTodos();document.getElementById('newTodoText').value=''}
+function deleteTodo(id){todos=todos.filter(function(t){return t.id!==id});saveTodos();renderTodos()}
+function editTodo(id){
+  var el=document.querySelector('.todo-text[ondblclick="editTodo(\''+id+'\')"]');
+  if(!el||el.querySelector('input')) return;
+  var t=todos.find(function(x){return x.id===id});
+  if(!t) return;
+  var inp=document.createElement('input');
+  inp.className='todo-edit';inp.value=t.text;
+  inp.onblur=function(){saveEditTodo(id,inp.value)};
+  inp.onkeydown=function(e){if(e.key==='Enter'){inp.blur()}else if(e.key==='Escape'){inp.value=t.text;inp.blur()}};
+  el.innerHTML='';el.appendChild(inp);inp.focus();inp.select();
+}
+function saveEditTodo(id,newText){
+  var tx=newText.trim();if(!tx) return;
+  var t=todos.find(function(x){return x.id===id});
+  if(t){t.text=tx;saveTodos()}
+  renderTodos();
+}
+
+function switchTab(wkId){
+  curTab=wkId;
+  var btns=document.querySelectorAll('.tab-btn');
+  btns.forEach(function(b){b.classList.toggle('active',b.dataset.tab===wkId)});
+  var wk=WEEKS.find(function(w){return w.id===wkId});
+  if(!wk) return;
+  var badge=document.getElementById('dateBadge');
+  var wd=getWeekData(wk);
+  if(wd && !wk.est && wk.id!=='month'){
+    if(wk.partial) {
+      badge.textContent='[真实-5天] '+wk.label+' ('+wk.sub+')';
+      badge.style.borderColor='#3b82f6';
+    } else {
+      badge.textContent='[真实] '+wk.label+' ('+wk.sub+')';
+      badge.style.borderColor='#22c55e';
+    }
+  } else if(wk.est){
+    badge.textContent='[估算] '+wk.label+' ('+wk.sub+')';
+    badge.style.borderColor='#f59e0b';
+  } else if(wk.id==='month'){
+    badge.textContent=DATA.date;
+    badge.style.borderColor='#2a2d3e';
+  } else {
+    badge.textContent=wk.label+' ('+wk.sub+') - 暂无数据';
+    badge.style.borderColor='#ef4444';
+  }
+  renderKPI(wd?wd.total:null, wk);
+  renderCharts(wd);
+  renderTable(wd);
+  renderAlerts(wd);
+  renderTodos();
+}
+
+// Build tabs - two rows: weekly top, monthly bottom
+(function(){
+  var weekHtml='', monthHtml='';
+  WEEKS.forEach(function(w,i){
+    var subText=w.sub;
+    if(w.est) subText='~'+subText;
+    else if(!w.est&&w.wkKey) subText='*'+subText;
+    var btn='<button class="tab-btn'+(w.id==='month'?' active':'')+'" data-tab="'+w.id+'">'+w.label+'<br><small>'+subText+'</small></button>';
+    if(w.id==='month'){
+      monthHtml+=btn;
+    } else {
+      if(i===5) weekHtml+='<span class="tab-sep"></span>';
+      weekHtml+=btn;
+    }
+  });
+  document.getElementById('tabWeek').innerHTML=weekHtml;
+  document.getElementById('tabMonth').innerHTML=monthHtml;
+  var btns=document.querySelectorAll('.tab-btn');
+  btns.forEach(function(b){b.addEventListener('click',function(){switchTab(b.dataset.tab)})});
+})();
+
+document.getElementById('dateBadge').textContent=DATA.date;
+switchTab('month');
+</script>
+</body>
+</html>
