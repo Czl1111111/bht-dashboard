@@ -273,7 +273,9 @@ var curTab = DEFAULT_TAB;
 // ===== TODO SYSTEM (BHTZ-style, dual week/month) =====
 var weekTodos=[], monthTodos=[];
 var weekTodoFilter='all', monthTodoFilter='all';
-var TODO_VER = 'v4';
+var TODO_VER = 'v5';
+var WEEK_TODOS_DEFAULT = [{"id":1003,"text":"上周-紧急 HX1045(BHT盒装-330pcs) 亏损 -1.0% - 排查原因并优化","priority":"urgent","children":[{"id":1001,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":1002,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":1006,"text":"上周-紧急 HX1053(BHT盒装200pcs-4) 亏损 -1.5% - 排查原因并优化","priority":"urgent","children":[{"id":1004,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":1005,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":1009,"text":"上周-紧急 HX2090(BHT-蓝黄盒子-520pcs) 亏损 -258.2% - 排查原因并优化","priority":"urgent","children":[{"id":1007,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":1008,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":1010,"text":"上周-重要 HX1025 利润率偏低 3.2% - 持续关注","priority":"important","children":[],"collapsed":false},{"id":1012,"text":"上周-重要 HX1236 广告ACoS 46.6%过高 - 优化广告投放","priority":"important","children":[{"id":1011,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":1014,"text":"上周-重要 HX1616 广告ACoS 100.0%过高 - 优化广告投放","priority":"important","children":[{"id":1013,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":1016,"text":"上周-重要 HX2089 广告ACoS 100.0%过高 - 优化广告投放","priority":"important","children":[{"id":1015,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":1017,"text":"上周-普通 HX1352 CVR仅10.0% - Listing优化提转化","priority":"normal","children":[{"id":1018,"text":"检查主图/标题/五点/A+页面","priority":"normal","children":[]}]},{"id":1019,"text":"上周-普通 HX2091 CVR仅5.4% - Listing优化提转化","priority":"normal","children":[{"id":1020,"text":"检查主图/标题/五点/A+页面","priority":"normal","children":[]}]},{"id":1021,"text":"上周 整体目标: 利润率达8% (上周7.8%)","priority":"urgent","children":[{"id":1022,"text":"审查广告预算分配,控制TACoS","priority":"urgent","children":[]},{"id":1023,"text":"排查高退款率SKU,优化品质/包装","priority":"important","children":[]}],"collapsed":false}];
+var MONTH_TODOS_DEFAULT = [{"id":2003,"text":"月度-紧急 HX1045(BHT盒装-330pcs) 亏损 -4.4% - 排查原因并优化","priority":"urgent","children":[{"id":2001,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":2002,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":2006,"text":"月度-紧急 HX2091(BHT-蓝黄盒子-620pcs) 亏损 -4.2% - 排查原因并优化","priority":"urgent","children":[{"id":2004,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":2005,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":2009,"text":"月度-紧急 HX2089(BHT-蓝黄盒子-420pcs) 亏损 -77.9% - 排查原因并优化","priority":"urgent","children":[{"id":2007,"text":"分析成本构成: 采购/FBA/广告占比","priority":"urgent","children":[]},{"id":2008,"text":"对比竞品价格,判断提价空间","priority":"urgent","children":[]}],"collapsed":false},{"id":2011,"text":"月度-重要 HX1053 广告ACoS 36.1%过高 - 优化广告投放","priority":"important","children":[{"id":2010,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":2013,"text":"月度-重要 HX1820 广告ACoS 35.1%过高 - 优化广告投放","priority":"important","children":[{"id":2012,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":2015,"text":"月度-重要 HX1615 广告ACoS 3475.0%过高 - 优化广告投放","priority":"important","children":[{"id":2014,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":2017,"text":"月度-重要 HX1235 广告ACoS 81.8%过高 - 优化广告投放","priority":"important","children":[{"id":2016,"text":"筛选ACoS>40%关键词降bid或否定","priority":"important","children":[]}],"collapsed":false},{"id":2019,"text":"月度-重要 HX2090 CVR仅1.5% - Listing优化提转化","priority":"important","children":[{"id":2018,"text":"检查主图/标题/五点/A+页面","priority":"important","children":[]}],"collapsed":false},{"id":2020,"text":"月度 整体目标: 利润率达8% (上周7.6%)","priority":"urgent","children":[{"id":2021,"text":"审查广告预算分配,控制TACoS","priority":"urgent","children":[]},{"id":2022,"text":"排查高退款率SKU,优化品质/包装","priority":"important","children":[]}],"collapsed":false},{"id":2023,"text":"8月规划: 补货计划(检查库存覆盖天数)","priority":"important","children":[]},{"id":2024,"text":"8月目标: 保持BSR排名,利润率冲刺9%","priority":"normal","children":[]}];
 
 function tLoad(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}}
 function tSave(k,d){try{localStorage.setItem(k,JSON.stringify(d))}catch(e){}}
@@ -469,22 +471,18 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
 function initTodos(){
   var storedVer=localStorage.getItem('bht_todo_ver');
   if(storedVer!==TODO_VER){
-    // Version changed: reset to current data-driven defaults (syncs across devices)
+    // Version changed: reset to embedded defaults (syncs across devices)
     localStorage.removeItem('bht_week_todos_v2');
     localStorage.removeItem('bht_month_todos_v2');
     localStorage.setItem('bht_todo_ver',TODO_VER);
   }
   weekTodos=tLoad('bht_week_todos_v2');monthTodos=tLoad('bht_month_todos_v2');
-  // Generate defaults if empty
-  if(!weekTodos.length&&window._lastWd){
-    weekTodos=genDefaults(false,window._lastWd);tSave('bht_week_todos_v2',weekTodos);
+  // Use embedded defaults if empty (synced across all devices)
+  if(!weekTodos.length){
+    weekTodos=WEEK_TODOS_DEFAULT;tSave('bht_week_todos_v2',weekTodos);
   }
   if(!monthTodos.length){
-    // Use latest month data for defaults
-    var mk=Object.keys(MONTHS_DATA).sort().pop();
-    var md=mk?MONTHS_DATA[mk]:null;
-    if(md) monthTodos=genDefaults(true,{skus:md.skus,total:md.total});else monthTodos=[{id:2001,text:'月度 核验7月利润率是否达到8%目标',priority:'urgent',children:[],collapsed:false},{id:2002,text:'月度 8月广告预算规划',priority:'important',children:[]},{id:2003,text:'月度 供应商比价谈判(降低采购成本)',priority:'normal',children:[]}];
-    tSave('bht_month_todos_v2',monthTodos);
+    monthTodos=MONTH_TODOS_DEFAULT;tSave('bht_month_todos_v2',monthTodos);
   }
   renderAllTodos();
 }
