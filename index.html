@@ -284,8 +284,10 @@ function tFlatten(arr,level,filt){
 function genDefaults(isMonth,wd){
   var items=[];
   // For weekly todos, use previous week's data if available
+  var prevLabel='';
   if(!isMonth&&window._prevWd&&window._prevWd.skus){
     wd=window._prevWd;
+    prevLabel=window._prevWeekLabel||'上周';
   }
   if(!wd||!wd.skus) return items;
   var skus=wd.skus.slice();
@@ -294,7 +296,7 @@ function genDefaults(isMonth,wd){
   var urgent=[], important=[], normal=[];
   skus.forEach(function(s){
     var m=parseFloat(s.margin)||0, a=parseFloat(s.acos)||0, c=parseFloat(s.cvr)||0, ad=s.ad||0, o=s.o||0;
-    var prefix=isMonth?'月度':'周度';
+    var prefix=isMonth?'月度':'上周';
     if(m<0) urgent.push({sku:s.sku,name:s.name||s.sku,margin:m,acos:a,cvr:c,ad:ad,orders:o});
     else if(m<5||a>35) important.push({sku:s.sku,name:s.name||s.sku,margin:m,acos:a,cvr:c,ad:ad,orders:o});
     else if(c<12) normal.push({sku:s.sku,name:s.name||s.sku,margin:m,acos:a,cvr:c,ad:ad,orders:o});
@@ -311,10 +313,12 @@ function genDefaults(isMonth,wd){
       arr.push({id:++id,text:txt,priority:prio,children:sub,collapsed:false});
     });
   }
-  add(items,'urgent',isMonth?'月度-紧急':'周度-紧急',urgent);
-  add(items,'important',isMonth?'月度-重要':'周度-重要',important);
-  var pfx=isMonth?'月度':'周度';
-  items.push({id:++id,text:pfx+' 整体目标: 利润率达8% (当前'+wd.total.margin.toFixed(1)+'%)',priority:'urgent',children:[
+  add(items,'urgent',isMonth?'月度-紧急':'上周-紧急',urgent);
+  add(items,'important',isMonth?'月度-重要':'上周-重要',important);
+  if(!isMonth) normal.forEach(function(x){items.push({id:++id,text:'上周-普通 '+x.sku+' CVR仅'+x.cvr.toFixed(1)+'% - Listing优化提转化',priority:'normal',children:[{id:++id,text:'检查主图/标题/五点/A+页面',priority:'normal',children:[]}]})});
+  var pfx=isMonth?'月度':'上周';
+  var srcNote=prevLabel?' (数据来源:'+prevLabel+')':'';
+  items.push({id:++id,text:pfx+' 整体目标: 利润率达8% (上周'+wd.total.margin.toFixed(1)+'%)'+srcNote,priority:'urgent',children:[
     {id:++id,text:'审查广告预算分配,控制TACoS',priority:'urgent',children:[]},
     {id:++id,text:'排查高退款率SKU,优化品质/包装',priority:'important',children:[]}
   ],collapsed:false});
@@ -893,6 +897,7 @@ function switchTab(wkId){
   window._lastWd=wd;
   // Find previous week's data for todo generation (weekly tabs only)
   window._prevWd=null;
+  window._prevWeekLabel='';
   if(wkId.indexOf('month_')!==0){
     var wkIdx=-1;
     for(var i=0;i<WEEKS.length;i++){if(WEEKS[i].id===wkId){wkIdx=i;break;}}
@@ -901,7 +906,7 @@ function switchTab(wkId){
         var pw=WEEKS[i];
         if(pw.id.indexOf('month_')===0) continue;
         var pwd=getWeekData(pw);
-        if(pwd&&pwd.skus&&pwd.skus.length){window._prevWd=pwd;break;}
+        if(pwd&&pwd.skus&&pwd.skus.length){window._prevWd=pwd;window._prevWeekLabel=pw.label+'('+pw.sub+')';break;}
       }
     }
   }
