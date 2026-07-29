@@ -72,6 +72,8 @@ tbody tr:hover{background:#1a1c2a}
 /* === BHTZ-style Todos === */
 .todo-wrap{margin-bottom:18px}
 .todo-wrap h4{font-size:13px;color:#fff;margin:0 0 6px 0;font-weight:700}
+.todo-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.todo-hdr h4{margin:0}.todo-fold-btn{font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid #2a2d3e;background:#1e2030;color:#8b90a0;cursor:pointer;font-family:inherit}.todo-fold-btn:hover{color:#fff;border-color:#7c3aed}
 .todo-filters{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
 .todo-filters button{font-size:10px;padding:3px 9px;border-radius:5px;border:1px solid #2a2d3e;background:#1e2030;color:#8b90a0;cursor:pointer;font-family:inherit;transition:all .15s}
 .todo-filters button:hover{background:#232638;color:#fff}
@@ -156,7 +158,7 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 1. 核心KPI -->
   <div class="section-wrap" draggable="true" data-section="kpi">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="kpiToggle" onclick="toggleSection('kpi')">▼</button>
       <span class="section-title">核心KPI</span>
     </div>
@@ -167,7 +169,7 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 2. 图表分析 -->
   <div class="section-wrap" draggable="true" data-section="charts">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="chartsToggle" onclick="toggleSection('charts')">▼</button>
       <span class="section-title">图表分析</span>
     </div>
@@ -199,7 +201,7 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 3. 重点关注 -->
   <div class="section-wrap" draggable="true" data-section="alerts">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="alertsToggle" onclick="toggleSection('alerts')">▼</button>
       <span class="section-title">重点关注</span>
     </div>
@@ -210,15 +212,15 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 4. 待办事项 -->
   <div class="section-wrap" draggable="true" data-section="todos">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="todosToggle" onclick="toggleSection('todos')">▼</button>
       <span class="section-title">待办事项</span>
     </div>
     <div class="section-body" id="todosBody">
       <div style="padding:4px 14px 12px">
-        <div class="todo-wrap"><h4>📅 周度待办 (基于当前周数据分析)</h4><div id="weekTodoFilters" class="todo-filters"></div><div id="weekTodoList" class="todo-list"></div><div class="todo-add-wrap"><button id="btn-add-week-todo">+ 添加周度待办</button></div>
+        <div class="todo-wrap"><div class="todo-hdr"><h4>📅 周度待办 (基于上周数据分析)</h4><div><button class="todo-fold-btn" onclick="toggleTodoFold('week',false)">📂 全部折叠</button><button class="todo-fold-btn" onclick="toggleTodoFold('week',true)" style="margin-left:4px">📋 全部展开</button></div></div><div id="weekTodoFilters" class="todo-filters"></div><div id="weekTodoList" class="todo-list"></div><div class="todo-add-wrap"><button id="btn-add-week-todo">+ 添加周度待办</button></div>
         </div>
-        <div class="todo-wrap" style="margin-top:18px"><h4>📊 月度待办 (基于月度数据分析8月规划)</h4><div id="monthTodoFilters" class="todo-filters"></div><div id="monthTodoList" class="todo-list"></div><div class="todo-add-wrap"><button id="btn-add-month-todo">+ 添加月度待办</button></div></div>
+        <div class="todo-wrap" style="margin-top:18px"><div class="todo-hdr"><h4>📊 月度待办 (基于月度数据分析8月规划)</h4><div><button class="todo-fold-btn" onclick="toggleTodoFold('month',false)">📂 全部折叠</button><button class="todo-fold-btn" onclick="toggleTodoFold('month',true)" style="margin-left:4px">📋 全部展开</button></div></div><div id="monthTodoFilters" class="todo-filters"></div><div id="monthTodoList" class="todo-list"></div><div class="todo-add-wrap"><button id="btn-add-month-todo">+ 添加月度待办</button></div></div>
         </div>
       </div>
     </div>
@@ -226,7 +228,7 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 5. HX1045专项优化 -->
   <div class="section-wrap" draggable="true" data-section="hxplan">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="hxplanToggle" onclick="toggleSection('hxplan')">▼</button>
       <span class="section-title">HX1045专项优化</span>
     </div>
@@ -239,7 +241,7 @@ tbody tr:hover{background:#1a1c2a}
   <!-- 6. SKU明细表 -->
   <div class="section-wrap" draggable="true" data-section="skutable">
     <div class="section-header">
-      <span class="drag-handle" draggable="true">⠿</span>
+      <span class="drag-handle">⠿</span>
       <button class="section-toggle" id="skutableToggle" onclick="toggleSection('skutable')">▼</button>
       <span class="section-title">SKU明细表</span>
     </div>
@@ -278,6 +280,8 @@ function tMaxId(arr){var m=0;function w(a){for(var i=0;i<a.length;i++){if(a[i].i
 function tFind(arr,id){for(var i=0;i<arr.length;i++){if(arr[i].id===id)return{item:arr[i],parent:arr,index:i};if(arr[i].children&&arr[i].children.length>0){var f=tFind(arr[i].children,id);if(f)return f}}return null}
 function tDescendant(arr,aid,cid){var f=tFind(arr,aid);if(!f||!f.item.children)return false;for(var i=0;i<f.item.children.length;i++){if(f.item.children[i].id===cid)return true;if(tDescendant(f.item.children,f.item.children[i].id,cid))return true}return false}
 
+function tFoldAll(arr,collapsed){for(var i=0;i<arr.length;i++){arr[i].collapsed=collapsed;if(arr[i].children&&arr[i].children.length)tFoldAll(arr[i].children,collapsed)}}
+function toggleTodoFold(type,expand){var list=type==='week'?weekTodos:monthTodos;var key=type==='week'?'bht_week_todos_v2':'bht_month_todos_v2';tFoldAll(list,!expand);tSave(key,list);renderAllTodos()}
 function tFlatten(arr,level,filt){
   var r=[];for(var i=0;i<arr.length;i++){var t=arr[i];var self=(filt==='all'||t.priority===filt);if(self)r.push({id:t.id,text:t.text,priority:t.priority,level:level,hasChildren:!!(t.children&&t.children.length>0),collapsed:!!t.collapsed,childCount:t.children?t.children.length:0});if(t.children&&t.children.length>0&&!t.collapsed){var k=tFlatten(t.children,level+1,filt);for(var j=0;j<k.length;j++)r.push(k[j])}}return r}
 
@@ -535,28 +539,36 @@ var sectionState = JSON.parse(localStorage.getItem('bht_sections')||'{}');
 function initDragDrop(){
   var container=document.getElementById('sectionContainer');
   if(!container) return;
-  var wraps=container.querySelectorAll('.section-wrap');
   var dragged=null;
-  wraps.forEach(function(w){
-    w.addEventListener('dragstart',function(e){
-      dragged=this;this.classList.add('dragging');
-      e.dataTransfer.effectAllowed='move';
-    });
-    w.addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag-over')});
-    w.addEventListener('dragleave',function(){this.classList.remove('drag-over')});
-    w.addEventListener('drop',function(e){
-      e.preventDefault();this.classList.remove('drag-over');
-      if(dragged!==this){
-        var rect=this.getBoundingClientRect();
-        var mid=rect.top+rect.height/2;
-        if(e.clientY<mid){container.insertBefore(dragged,this)}
-        else{container.insertBefore(dragged,this.nextSibling)}
-        saveSectionOrder();
-      }
-    });
-    w.addEventListener('dragend',function(){this.classList.remove('dragging');
-      container.querySelectorAll('.section-wrap').forEach(function(x){x.classList.remove('drag-over')});
-    });
+  container.addEventListener('dragstart',function(e){
+    var wrap=e.target.closest('.section-wrap');
+    if(!wrap) return;
+    dragged=wrap;wrap.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  });
+  container.addEventListener('dragover',function(e){
+    e.preventDefault();
+    var wrap=e.target.closest('.section-wrap');
+    if(wrap&&wrap!==dragged) wrap.classList.add('drag-over');
+  });
+  container.addEventListener('dragleave',function(e){
+    var wrap=e.target.closest('.section-wrap');
+    if(wrap) wrap.classList.remove('drag-over');
+  });
+  container.addEventListener('drop',function(e){
+    e.preventDefault();
+    var wrap=e.target.closest('.section-wrap');
+    if(wrap&&dragged&&wrap!==dragged){
+      wrap.classList.remove('drag-over');
+      var rect=wrap.getBoundingClientRect();
+      if(e.clientY<rect.top+rect.height/2) container.insertBefore(dragged,wrap);
+      else container.insertBefore(dragged,wrap.nextSibling);
+      saveSectionOrder();
+    }
+  });
+  container.addEventListener('dragend',function(){
+    if(dragged){dragged.classList.remove('dragging');dragged=null}
+    container.querySelectorAll('.section-wrap').forEach(function(x){x.classList.remove('drag-over')});
   });
 }
 function saveSectionOrder(){
