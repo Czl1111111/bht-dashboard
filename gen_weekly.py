@@ -187,6 +187,29 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
         else:
             sku_cvr = 0
 
+        # 广告CVR (col 42) and 自然CVR (col 43): same format detection
+        def calc_sub_cvr(col_idx):
+            sub_cvr = 0; sub_weight = 0
+            for idx in range(len(sgrp)):
+                try:
+                    if sgrp.shape[1] > col_idx:
+                        raw = sgrp.iloc[idx, col_idx]
+                        if pd.isna(raw): continue
+                        raw_str = str(raw)
+                        is_pct = '%' in raw_str
+                        d_val = n(raw)
+                        d_ord = int(abs(n(sgrp.iloc[idx, 12])))
+                        if d_ord > 0:
+                            sub_cvr += d_val * d_ord
+                            sub_weight += d_ord
+                except: pass
+            if sub_weight > 0:
+                avg_raw = sub_cvr / sub_weight
+                return round(avg_raw, 2) if avg_raw > 1 else round(avg_raw * 100, 2)
+            return 0
+        sku_ad_cvr = calc_sub_cvr(42)
+        sku_nat_cvr = calc_sub_cvr(43)
+
         def pct_str(v, has_data=False):
             if not has_data: return 'N/A'
             if v is None: return 'N/A'
@@ -203,6 +226,8 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
             'tacos': pct_str(sku_tacos, sku_tacos > 0),
             'bsr': f'{sku_bsr_cat} #{sku_bsr}' if sku_bsr and sku_bsr_cat else (str(sku_bsr) if sku_bsr else 'N/A'),
             'cvr': pct_str(sku_cvr, cvr_weight_sum > 0),
+            'ad_cvr': pct_str(sku_ad_cvr, sku_ad_cvr > 0),
+            'nat_cvr': pct_str(sku_nat_cvr, sku_nat_cvr > 0),
         })
     # Sort by sales descending
     # Sort by parent ASIN order then by sales descending

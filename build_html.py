@@ -559,15 +559,18 @@ function initDragDrop(){
     if(!wrap) return;
     dragged=wrap;wrap.classList.add('dragging');
     e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain','');
   });
   container.addEventListener('dragover',function(e){
     e.preventDefault();
+    e.dataTransfer.dropEffect='move';
     var wrap=e.target.closest('.section-wrap');
     if(wrap&&wrap!==dragged) wrap.classList.add('drag-over');
   });
   container.addEventListener('dragleave',function(e){
     var wrap=e.target.closest('.section-wrap');
-    if(wrap) wrap.classList.remove('drag-over');
+    // Only remove highlight when truly leaving the section, not when entering a child
+    if(wrap&&!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');
   });
   container.addEventListener('drop',function(e){
     e.preventDefault();
@@ -799,12 +802,12 @@ function renderTable(wd){
       cp=s.p;
       var sb=wd.skus.filter(function(r){return r.p===cp});
       var to=sb.reduce(function(a,r){return a+r.o},0),ts=sb.reduce(function(a,r){return a+r.s},0),ta=sb.reduce(function(a,r){return a+r.ad},0);
-      html+='<tr class="subtot"><td colspan="3"><b>'+cp+'</b> '+PD[cp]+'</td><td style="color:#8b90a0">'+sb.length+'SKU</td><td><b>'+to.toLocaleString()+'</b></td><td><b>$'+ts.toLocaleString()+'</b></td><td><b>$'+ta.toLocaleString()+'</b></td><td colspan="2">TACoS '+(ts>0?(ta/ts*100).toFixed(1):0)+'%</td><td></td><td></td><td></td><td></td><td></td></tr>';
+      html+='<tr class="subtot"><td colspan="3"><b>'+cp+'</b> '+PD[cp]+'</td><td style="color:#8b90a0">'+sb.length+'SKU</td><td><b>'+to.toLocaleString()+'</b></td><td><b>$'+ts.toLocaleString()+'</b></td><td><b>$'+ta.toLocaleString()+'</b></td><td colspan="2">TACoS '+(ts>0?(ta/ts*100).toFixed(1):0)+'%</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
     }
     var mv=0;try{mv=parseFloat(s.margin.replace('%',''))}catch(e){}
     var tg=isNaN(mv)?'tgy':mv<0?'tgr':mv<8?'tgy':'tgg';
     var ic=isNaN(mv)?'?':mv<0?'!!':'~';
-    html+='<tr><td style="color:#8b90a0;font-size:10px">'+s.p+'</td><td><b>'+s.sku+'</b></td><td style="font-size:10px;color:#8b90a0">'+(s.asin||'')+'</td><td>'+s.name+'</td><td>'+s.o.toLocaleString()+'</td><td>$'+s.s.toLocaleString()+'</td><td>$'+s.ad.toLocaleString()+'</td><td>'+(s.acos||'N/A')+'</td><td>'+(s.tacos||'N/A')+'</td><td><span class="tag '+tg+'">'+s.margin+'</span></td><td>'+(s.bsr||'N/A')+'</td><td>'+(s.cvr||'N/A')+'</td><td>'+(s.ret||'N/A')+'</td><td style="color:'+(isNaN(mv)?'#8b90a0':mv<0?'#ef4444':mv<8?'#f59e0b':'#22c55e')+'">'+ic+'</td></tr>';
+    html+='<tr><td style="color:#8b90a0;font-size:10px">'+s.p+'</td><td><b>'+s.sku+'</b></td><td style="font-size:10px;color:#8b90a0">'+(s.asin||'')+'</td><td>'+s.name+'</td><td>'+s.o.toLocaleString()+'</td><td>$'+s.s.toLocaleString()+'</td><td>$'+s.ad.toLocaleString()+'</td><td>'+(s.acos||'N/A')+'</td><td>'+(s.tacos||'N/A')+'</td><td>'+(s.cvr||'N/A')+'</td><td>'+(s.ad_cvr||'N/A')+'</td><td>'+(s.nat_cvr||'N/A')+'</td><td><span class="tag '+tg+'">'+s.margin+'</span></td><td>'+(s.bsr||'N/A')+'</td><td style="color:'+(isNaN(mv)?'#8b90a0':mv<0?'#ef4444':mv<8?'#f59e0b':'#22c55e')+'">'+ic+'</td></tr>';
   });
   document.getElementById('skuTbody').innerHTML=html;
 }
@@ -1059,9 +1062,9 @@ html_parts.append('''</style>
 <div class="tab-nav" id="tabMonth" style="margin-bottom:14px"></div>
 <div id="sectionContainer">
   <!-- 1. 核心KPI -->
-  <div class="section-wrap" draggable="true" data-section="kpi">
+  <div class="section-wrap" data-section="kpi">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="kpiToggle" onclick="toggleSection(\x27kpi\x27)">▼</button>
       <span class="section-title">核心KPI</span>
     </div>
@@ -1070,9 +1073,9 @@ html_parts.append('''</style>
     </div>
   </div>
   <!-- 2. 图表分析 -->
-  <div class="section-wrap" draggable="true" data-section="charts">
+  <div class="section-wrap" data-section="charts">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="chartsToggle" onclick="toggleSection(\x27charts\x27)">▼</button>
       <span class="section-title">图表分析</span>
     </div>
@@ -1102,9 +1105,9 @@ html_parts.append('''</style>
     </div>
   </div>
   <!-- 3. 重点关注 -->
-  <div class="section-wrap" draggable="true" data-section="alerts">
+  <div class="section-wrap" data-section="alerts">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="alertsToggle" onclick="toggleSection(\x27alerts\x27)">▼</button>
       <span class="section-title">重点关注</span>
     </div>
@@ -1113,9 +1116,9 @@ html_parts.append('''</style>
     </div>
   </div>
   <!-- 4. 待办事项 -->
-  <div class="section-wrap" draggable="true" data-section="todos">
+  <div class="section-wrap" data-section="todos">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="todosToggle" onclick="toggleSection(\x27todos\x27)">▼</button>
       <span class="section-title">待办事项</span>
     </div>
@@ -1129,9 +1132,9 @@ html_parts.append('''</style>
     </div>
   </div>
   <!-- 5. HX1045专项优化 -->
-  <div class="section-wrap" draggable="true" data-section="hxplan">
+  <div class="section-wrap" data-section="hxplan">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="hxplanToggle" onclick="toggleSection(\x27hxplan\x27)">▼</button>
       <span class="section-title">HX1045专项优化</span>
     </div>
@@ -1142,9 +1145,9 @@ html_parts.append('''</style>
     </div>
   </div>
   <!-- 6. SKU明细表 -->
-  <div class="section-wrap" draggable="true" data-section="skutable">
+  <div class="section-wrap" data-section="skutable">
     <div class="section-header">
-      <span class="drag-handle">⠿</span>
+      <span class="drag-handle" draggable="true">⠿</span>
       <button class="section-toggle" id="skutableToggle" onclick="toggleSection(\x27skutable\x27)">▼</button>
       <span class="section-title">SKU明细表</span>
     </div>
@@ -1152,7 +1155,7 @@ html_parts.append('''</style>
       <div style="padding:4px 14px 12px">
         <div class="table-wrap">
           <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:700;color:#fff;margin:0">22个SKU明细</span><span style="font-size:10px;color:#8b90a0">绿>=15% 黄0~15% 红<0%</span></div>
-          <div class="table-scroll"><table><thead><tr><th>父ASIN</th><th>SKU</th><th>ASIN</th><th>品名</th><th>销量</th><th>销售额</th><th>广告费</th><th>ACoS</th><th>TACoS</th><th>毛利率</th><th>BSR</th><th>CVR</th><th>退货率</th><th>状态</th></tr></thead><tbody id="skuTbody"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th>父ASIN</th><th>SKU</th><th>ASIN</th><th>品名</th><th>销量</th><th>销售额</th><th>广告费</th><th>ACoS</th><th>TACoS</th><th>CVR</th><th>广告CVR</th><th>自然CVR</th><th>毛利率</th><th>BSR</th><th>状态</th></tr></thead><tbody id="skuTbody"></tbody></table></div>
         </div>
       </div>
     </div>
