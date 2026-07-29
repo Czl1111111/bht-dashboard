@@ -7,9 +7,12 @@ import json, os, glob
 
 DESKTOP = os.path.expanduser("~/Desktop")
 DATA_DIR = os.path.join(os.path.expanduser("~"), "bht_data")
+SRC_DIR = os.path.join(os.path.expanduser("~"), "WPSDrive", "381220911", "WPS云盘", "海杉", "数据分析和基础表", "周数据复盘", "下载的数据表格", "生成数据看板所用到的表格")
 os.chdir(DATA_DIR)
 
 SRC_FILES = [
+    os.path.join(SRC_DIR, 'BHT系列周数据复盘源数据.xlsx'),
+    os.path.join(SRC_DIR, '5月 周18 产品表现-2026.xlsx'),
     os.path.join(DESKTOP, 'BHT系列周数据复盘源数据.xlsx'),
     os.path.join(DESKTOP, '5月 周18 产品表现-2026.xlsx'),
 ]
@@ -116,16 +119,24 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
         s_total = sum(abs(n(v)) for v in sgrp.iloc[:,13])
         o_total = int(sum(abs(n(v)) for v in sgrp.iloc[:,11]))  # col[11]=销量
         a_total = sum(abs(n(v)) for v in sgrp.iloc[:,21])
-        # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) 加权平均
+        # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) & 结算毛利率(col[34]) 加权平均
         p_total = sum(n(v) for v in sgrp.iloc[:,16])
         weighted_m = 0.0
+        weighted_settle_m = 0.0
         for idx in range(len(sgrp)):
             row_s = abs(n(sgrp.iloc[idx,13]))
+            # 订单毛利率 col[35]
             m_str = str(sgrp.iloc[idx,35])
             try: row_m = float(m_str.replace('%','').replace(',',''))
             except: row_m = 0
             weighted_m += row_s * row_m
+            # 结算毛利率 col[34]
+            sm_str = str(sgrp.iloc[idx,34])
+            try: row_sm = float(sm_str.replace('%','').replace(',',''))
+            except: row_sm = 0
+            weighted_settle_m += row_s * row_sm
         m = round(weighted_m/s_total, 2) if s_total>0 else 0
+        settle_m = round(weighted_settle_m/s_total, 2) if s_total>0 else 0
         first_row = sgrp.iloc[0]
 
         # TACoS: computed from weekly totals
@@ -222,6 +233,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
             'o': o_total, 's': round(s_total), 'ad': round(a_total),
             'ad_sales': round(ad_sales_total), 'sessions': sessions_total, 'pf': round(p_total),
             'margin': f'{m:.2f}%',
+            'settle_margin': f'{settle_m:.2f}%',
             'acos': pct_str(sku_acos, sku_acos > 0),
             'tacos': pct_str(sku_tacos, sku_tacos > 0),
             'bsr': f'{sku_bsr_cat} #{sku_bsr}' if sku_bsr and sku_bsr_cat else (str(sku_bsr) if sku_bsr else 'N/A'),
@@ -252,7 +264,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
 import re
 from datetime import datetime
 
-order_files = glob.glob(os.path.join(DESKTOP, '2026.*订单利润.xlsx'))
+order_files = glob.glob(os.path.join(DESKTOP, '2026.*订单利润.xlsx')) + glob.glob(os.path.join(SRC_DIR, '2026.*订单利润.xlsx'))
 print(f"\nProcessing {len(order_files)} weekly order profit files...")
 
 def parse_week_from_filename(fname):
@@ -321,7 +333,7 @@ for f in sorted(order_files):
     print(f"  {key}: sales=${total_sales_op:,.0f}, orderMargin={order_margin}%")
 
 # ===== Process daily settlement profit file (按天) =====
-daily_settle_files = glob.glob(os.path.join(DESKTOP, '*结算利润*按天*.xlsx'))
+daily_settle_files = glob.glob(os.path.join(DESKTOP, '*结算利润*按天*.xlsx')) + glob.glob(os.path.join(SRC_DIR, '*结算利润*按天*.xlsx'))
 print(f"\nProcessing daily settlement profit files...")
 settlement_by_week = {}
 

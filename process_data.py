@@ -8,6 +8,7 @@ import json, os, re, glob, subprocess, sys
 
 DESKTOP = os.path.expanduser("~/Desktop")
 DATA_DIR = os.path.join(os.path.expanduser("~"), "bht_data")
+SRC_DIR = os.path.join(os.path.expanduser("~"), "WPSDrive", "381220911", "WPS云盘", "海杉", "数据分析和基础表", "周数据复盘", "下载的数据表格", "生成数据看板所用到的表格")
 os.chdir(DATA_DIR)
 
 TARGET = ['HX1822','HX1045','HX1053','HX1820','HX1821','HX1599','HX1352',
@@ -16,11 +17,21 @@ TARGET = ['HX1822','HX1045','HX1053','HX1820','HX1821','HX1599','HX1352',
           'HX2091','HX2089','HX2090']
 PMAP = {'HX1822':'B09N9815DF','HX1045':'B09N9815DF','HX1053':'B09N9815DF','HX1820':'B09N9815DF','HX1821':'B09N9815DF','HX1599':'B09N9815DF','HX1352':'B09N9815DF','HX1026':'B0C3QMWY9K','HX1025':'B0C3QMWY9K','HX1027':'B0C3QMWY9K','HX1046':'B0C3QMWY9K','HX1819':'B0C3QMWY9K','HX1234':'B09G9RL5D3','HX1233':'B09G9RL5D3','HX1236':'B09G9RL5D3','HX1616':'B09G9RL5D3','HX1235':'B09G9RL5D3','HX1614':'B09G9RL5D3','HX1615':'B09G9RL5D3','HX2091':'B0FN7BFHQY','HX2089':'B0FN7BFHQY','HX2090':'B0FN7BFHQY'}
 PNAMES = {'B09N9815DF':'330BHT(盒装)','B0C3QMWY9K':'瓶装BHT','B09G9RL5D3':'袋装BHT','B0FN7BFHQY':'蓝黄BHT'}
+SKU_ASINS = {
+    'HX1045':'B07Q3JJRY8','HX1822':'B0CZQ3273C','HX1053':'B07RX6QYX5',
+    'HX1820':'B0CZPXQ669','HX1821':'B0CZPYMRN7','HX1599':'B0BZNJW1ZF',
+    'HX1352':'B09GXNQSHT','HX1026':'B07L29DLGN','HX1025':'B07L21PL37',
+    'HX1027':'B07L2B5H15','HX1046':'B07Q6MW79Q','HX1819':'B0CZ3HP1S4',
+    'HX1234':'B09B9V5HM5','HX1233':'B09B9K4PLV','HX1236':'B09B9NP9F4',
+    'HX1616':'B0C52MS9P2','HX1235':'B09B9PJDRF','HX1614':'B0C5336727',
+    'HX1615':'B0C531C3TC','HX2091':'B0FN78ZLS3','HX2089':'B0FN7D6FMY',
+    'HX2090':'B0FN7C1DFK'
+}
 
 # ===== 1. Find all Lingxing exports and group by month =====
-settle_files = glob.glob(os.path.join(DESKTOP, '*结算利润*.xlsx'))
-order_files = glob.glob(os.path.join(DESKTOP, '*订单利润*.xlsx'))
-product_files = glob.glob(os.path.join(DESKTOP, '*产品分析*.xlsx')) + glob.glob(os.path.join(DESKTOP, '*产品表现*.xlsx'))
+settle_files = glob.glob(os.path.join(DESKTOP, '*结算利润*.xlsx')) + glob.glob(os.path.join(SRC_DIR, '*结算利润*.xlsx'))
+order_files = glob.glob(os.path.join(DESKTOP, '*订单利润*.xlsx')) + glob.glob(os.path.join(SRC_DIR, '*订单利润*.xlsx'))
+product_files = glob.glob(os.path.join(DESKTOP, '*产品分析*.xlsx')) + glob.glob(os.path.join(DESKTOP, '*产品表现*.xlsx')) + glob.glob(os.path.join(SRC_DIR, '*产品分析*.xlsx')) + glob.glob(os.path.join(SRC_DIR, '*产品表现*.xlsx'))
 # Exclude weekly source files (contain "周" in name)
 product_files = [f for f in product_files if '周' not in os.path.basename(f)]
 
@@ -158,16 +169,20 @@ for prefix, files in sorted(valid_months.items()):
     for _, r in mg.iterrows():
         skus.append({
             'p': str(r.get('父ASIN', '')), 'sku': str(r.get('SKU', '')),
+            'asin': SKU_ASINS.get(str(r.get('SKU', '')), str(r.get('ASIN', ''))),
             'name': str(r.get('品名', '')),
             'o': int(abs(n(r.get('销量', 0)))), 's': round(abs(n(r.get('销售额', 0)))),
             'ad': round(abs(n(r.get('广告费', 0)))),
             'ad_sales': round(abs(n(r.get('广告销售额', 0)))),
             'sessions': int(abs(n(r.get('会话数', 0)))),
             'acos': p(r.get('ACOS', 'N/A')),
-            'tacos': p(r.get('TACOS', 'N/A')), 'margin': p(r.get('毛利率', 'N/A')),
+            'tacos': p(r.get('TACOS', 'N/A')),
+            'margin': p(r.get('订单毛利率', r.get('毛利率', 'N/A'))),
+            'settle_margin': p(r.get('毛利率', 'N/A')),
             'bsr': str(r.get('小类BSR', '')), 'cvr': p(r.get('CVR', 'N/A')),
-            'ncvr': p(r.get('自然CVR', 'N/A')),
-            'acvr': p(r.get('广告CVR', 'N/A')), 'pf': round(n(r.get('毛利润', 0))),
+            'ad_cvr': p(r.get('广告CVR', 'N/A')),
+            'nat_cvr': p(r.get('自然CVR', 'N/A')),
+            'pf': round(n(r.get('毛利润', 0))),
             'fba': round(abs(n(r.get('FBA配送费', 0)))),
             'cogs': round(abs(n(r.get('采购成本', 0)))),
         })

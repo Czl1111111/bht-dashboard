@@ -77,11 +77,13 @@
       "margin": "-1.00%",
       "bsr": "Butt Terminals：7",
       "cvr": "18.98%",
-      "ncvr": "12.23%",
-      "acvr": "25.30%",
       "pf": -769,
       "fba": 15410,
-      "cogs": 29599
+      "cogs": 29599,
+      "asin": "B07Q3JJRY8",
+      "ad_cvr": "25.30%",
+      "nat_cvr": "12.23%",
+      "settle_margin": "-1.00%"
     },
     {
       "p": "B09N9815DF",
@@ -97,11 +99,13 @@
       "margin": "-1.53%",
       "bsr": "Butt Terminals：7",
       "cvr": "16.98%",
-      "ncvr": "9.80%",
-      "acvr": "24.62%",
       "pf": -138,
       "fba": 2136,
-      "cogs": 2890
+      "cogs": 2890,
+      "asin": "B07RX6QYX5",
+      "ad_cvr": "24.62%",
+      "nat_cvr": "9.80%",
+      "settle_margin": "-1.53%"
     },
     {
       "p": "B09N9815DF",
@@ -117,11 +121,13 @@
       "margin": "21.97%",
       "bsr": "Butt Terminals：9",
       "cvr": "13.10%",
-      "ncvr": "12.20%",
-      "acvr": "17.65%",
       "pf": 1710,
       "fba": 1260,
-      "cogs": 2822
+      "cogs": 2822,
+      "asin": "B0CZQ3273C",
+      "ad_cvr": "17.65%",
+      "nat_cvr": "12.20%",
+      "settle_margin": "21.97%"
     },
     {
       "p": "B09N9815DF",
@@ -137,11 +143,13 @@
       "margin": "22.34%",
       "bsr": "Butt Terminals：9",
       "cvr": "10.00%",
-      "ncvr": "9.01%",
-      "acvr": "19.42%",
       "pf": 1608,
       "fba": 963,
-      "cogs": 2966
+      "cogs": 2966,
+      "asin": "B09GXNQSHT",
+      "ad_cvr": "19.42%",
+      "nat_cvr": "9.01%",
+      "settle_margin": "22.34%"
     },
     {
       "p": "B09N9815DF",
@@ -157,11 +165,13 @@
       "margin": "20.84%",
       "bsr": "Butt Terminals：7",
       "cvr": "12.01%",
-      "ncvr": "9.57%",
-      "acvr": "19.33%",
       "pf": 1401,
       "fba": 860,
-      "cogs": 2545
+      "cogs": 2545,
+      "asin": "B0BZNJW1ZF",
+      "ad_cvr": "19.33%",
+      "nat_cvr": "9.57%",
+      "settle_margin": "20.84%"
     },
     {
       "p": "B09N9815DF",
@@ -177,11 +187,13 @@
       "margin": "22.36%",
       "bsr": "Butt Terminals：9",
       "cvr": "22.27%",
-      "ncvr": "22.11%",
-      "acvr": "22.91%",
       "pf": 1390,
       "fba": 1817,
-      "cogs": 1336
+      "cogs": 1336,
+      "asin": "B0CZPXQ669",
+      "ad_cvr": "22.91%",
+      "nat_cvr": "22.11%",
+      "settle_margin": "22.36%"
     },
     {
       "p": "B09N9815DF",
@@ -197,11 +209,13 @@
       "margin": "27.16%",
       "bsr": "Butt Terminals：7",
       "cvr": "17.83%",
-      "ncvr": "17.23%",
-      "acvr": "23.57%",
       "pf": 1110,
       "fba": 1079,
-      "cogs": 986
+      "cogs": 986,
+      "asin": "B0CZPYMRN7",
+      "ad_cvr": "23.57%",
+      "nat_cvr": "17.23%",
+      "settle_margin": "27.16%"
     },
     {
       "p": "B0C3QMWY9K",
@@ -217,11 +231,13 @@
       "margin": "3.21%",
       "bsr": "Butt Terminals：12",
       "cvr": "37.67%",
-      "ncvr": "29.28%",
-      "acvr": "42.82%",
       "pf": 726,
       "fba": 5272,
-      "cogs": 7811
+      "cogs": 7811,
+      "asin": "B07L21PL37",
+      "ad_cvr": "42.82%",
+      "nat_cvr": "29.28%",
+      "settle_margin": "3.21%"
     },
     {
       "p": "B0C3QMWY9K",
@@ -237,11 +253,13 @@
       "margin": "12.30%",
       "bsr": "Butt Terminals：12",
       "cvr": "43.99%",
-      "ncvr": "51.33%",
-      "acvr": "38.64%",
       "pf": 2217,
       "fba": 4107,
-      "cogs": 5404
+      "cogs": 5404,
+      "asin": "B07L29DLGN",
+      "ad_cvr": "38.64%",
+      "nat_cvr": "51.33%",
+      "settle_margin": "12.30%"
     },
     {
       "p": "B0C3QMWY9K",
@@ -257,11 +275,13 @@
       "margin": "7.55%",
       "bsr": "Butt Terminals：12",
       "cvr": "42.33%",
-      "ncvr": "40.13%",
-      "acvr": "43.57%",
       "pf": 988,
       "fba": 3025,
-      "cogs": 4094
+      "cogs": 4094,
+      "asin": "B07L2B5H15",
+      "ad_cvr": "43.57%",
+      "nat_cvr": "40.13%",
+      "settle_margin": "7.55%"
     },
     {
       "p": "B0C3QMWY9K",
@@ -277,11 +297,13 @@
       "margin": "26.50%",
       "bsr": "Butt Terminals：12",
       "cvr": "17.88%",
-      "ncvr": "16.81%",
-      "acvr": "21.43%",
       "pf": 520,
       "fba": 267,
-      "cogs": 744
+      "cogs": 744,
+      "asin": "B07Q6MW79Q",
+      "ad_cvr": "21.43%",
+      "nat_cvr": "16.81%",
+      "settle_margin": "26.50%"
     },
     {
       "p": "B0C3QMWY9K",
@@ -297,11 +319,13 @@
       "margin": "25.95%",
       "bsr": "Butt Terminals：12",
       "cvr": "13.61%",
-      "ncvr": "13.22%",
-      "acvr": "25.00%",
       "pf": 426,
       "fba": 360,
-      "cogs": 547
+      "cogs": 547,
+      "asin": "B0CZ3HP1S4",
+      "ad_cvr": "25.00%",
+      "nat_cvr": "13.22%",
+      "settle_margin": "25.95%"
     },
     {
       "p": "B09G9RL5D3",
@@ -317,11 +341,13 @@
       "margin": "9.84%",
       "bsr": "Butt Terminals：60",
       "cvr": "27.31%",
-      "ncvr": "25.87%",
-      "acvr": "28.18%",
       "pf": 932,
       "fba": 1394,
-      "cogs": 3802
+      "cogs": 3802,
+      "asin": "B09B9K4PLV",
+      "ad_cvr": "28.18%",
+      "nat_cvr": "25.87%",
+      "settle_margin": "9.84%"
     },
     {
       "p": "B09G9RL5D3",
@@ -337,11 +363,13 @@
       "margin": "17.25%",
       "bsr": "Butt Terminals：55",
       "cvr": "30.79%",
-      "ncvr": "30.58%",
-      "acvr": "30.89%",
       "pf": 1619,
       "fba": 1270,
-      "cogs": 3303
+      "cogs": 3303,
+      "asin": "B09B9V5HM5",
+      "ad_cvr": "30.89%",
+      "nat_cvr": "30.58%",
+      "settle_margin": "17.25%"
     },
     {
       "p": "B09G9RL5D3",
@@ -357,11 +385,13 @@
       "margin": "3.88%",
       "bsr": "Butt Terminals：60",
       "cvr": "15.67%",
-      "ncvr": "9.60%",
-      "acvr": "20.44%",
       "pf": 101,
       "fba": 435,
-      "cogs": 906
+      "cogs": 906,
+      "asin": "B09B9NP9F4",
+      "ad_cvr": "20.44%",
+      "nat_cvr": "9.60%",
+      "settle_margin": "3.88%"
     },
     {
       "p": "B09G9RL5D3",
@@ -377,11 +407,13 @@
       "margin": "35.68%",
       "bsr": "Butt Terminals：60",
       "cvr": "23.08%",
-      "ncvr": "18.64%",
-      "acvr": "66.67%",
       "pf": 714,
       "fba": 177,
-      "cogs": 741
+      "cogs": 741,
+      "asin": "B0C5336727",
+      "ad_cvr": "66.67%",
+      "nat_cvr": "18.64%",
+      "settle_margin": "35.68%"
     },
     {
       "p": "B09G9RL5D3",
@@ -397,11 +429,13 @@
       "margin": "28.44%",
       "bsr": "Butt Terminals：60",
       "cvr": "18.75%",
-      "ncvr": "18.42%",
-      "acvr": "25.00%",
       "pf": 456,
       "fba": 182,
-      "cogs": 689
+      "cogs": 689,
+      "asin": "B0C531C3TC",
+      "ad_cvr": "25.00%",
+      "nat_cvr": "18.42%",
+      "settle_margin": "28.44%"
     },
     {
       "p": "B09G9RL5D3",
@@ -417,11 +451,13 @@
       "margin": "35.89%",
       "bsr": "Butt Terminals：60",
       "cvr": "11.97%",
-      "ncvr": "11.97%",
-      "acvr": "0.00%",
       "pf": 462,
       "fba": 139,
-      "cogs": 448
+      "cogs": 448,
+      "asin": "B0C52MS9P2",
+      "ad_cvr": "0.00%",
+      "nat_cvr": "11.97%",
+      "settle_margin": "35.89%"
     },
     {
       "p": "B09G9RL5D3",
@@ -437,11 +473,13 @@
       "margin": "36.71%",
       "bsr": "Butt Terminals：60",
       "cvr": "24.47%",
-      "ncvr": "24.72%",
-      "acvr": "20.00%",
       "pf": 297,
       "fba": 101,
-      "cogs": 270
+      "cogs": 270,
+      "asin": "B09B9PJDRF",
+      "ad_cvr": "20.00%",
+      "nat_cvr": "24.72%",
+      "settle_margin": "36.71%"
     },
     {
       "p": "B0FN7BFHQY",
@@ -457,11 +495,13 @@
       "margin": "22.27%",
       "bsr": "Butt Terminals：1171",
       "cvr": "5.36%",
-      "ncvr": "2.38%",
-      "acvr": "14.29%",
       "pf": 65,
       "fba": 38,
-      "cogs": 107
+      "cogs": 107,
+      "asin": "B0FN78ZLS3",
+      "ad_cvr": "14.29%",
+      "nat_cvr": "2.38%",
+      "settle_margin": "22.27%"
     },
     {
       "p": "B0FN7BFHQY",
@@ -477,11 +517,13 @@
       "margin": "-258.18%",
       "bsr": "Butt Terminals：1171",
       "cvr": "0.00%",
-      "ncvr": "0.00%",
-      "acvr": "0.00%",
       "pf": -129,
       "fba": 7,
-      "cogs": 184
+      "cogs": 184,
+      "asin": "B0FN7C1DFK",
+      "ad_cvr": "0.00%",
+      "nat_cvr": "0.00%",
+      "settle_margin": "-258.18%"
     },
     {
       "p": "B0FN7BFHQY",
@@ -497,11 +539,13 @@
       "margin": "0.00%",
       "bsr": "Butt Terminals：1430",
       "cvr": "0.00%",
-      "ncvr": "0.00%",
-      "acvr": "0.00%",
       "pf": -24,
       "fba": 0,
-      "cogs": 0
+      "cogs": 0,
+      "asin": "B0FN7D6FMY",
+      "ad_cvr": "0.00%",
+      "nat_cvr": "0.00%",
+      "settle_margin": "0.00%"
     }
   ],
   "alerts": [

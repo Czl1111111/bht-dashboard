@@ -802,12 +802,12 @@ function renderTable(wd){
       cp=s.p;
       var sb=wd.skus.filter(function(r){return r.p===cp});
       var to=sb.reduce(function(a,r){return a+r.o},0),ts=sb.reduce(function(a,r){return a+r.s},0),ta=sb.reduce(function(a,r){return a+r.ad},0);
-      html+='<tr class="subtot"><td colspan="3"><b>'+cp+'</b> '+PD[cp]+'</td><td style="color:#8b90a0">'+sb.length+'SKU</td><td><b>'+to.toLocaleString()+'</b></td><td><b>$'+ts.toLocaleString()+'</b></td><td><b>$'+ta.toLocaleString()+'</b></td><td colspan="2">TACoS '+(ts>0?(ta/ts*100).toFixed(1):0)+'%</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+      html+='<tr class="subtot"><td colspan="3"><b>'+cp+'</b> '+PD[cp]+'</td><td style="color:#8b90a0">'+sb.length+'SKU</td><td><b>'+to.toLocaleString()+'</b></td><td><b>$'+ts.toLocaleString()+'</b></td><td><b>$'+ta.toLocaleString()+'</b></td><td colspan="2">TACoS '+(ts>0?(ta/ts*100).toFixed(1):0)+'%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
     }
     var mv=0;try{mv=parseFloat(s.margin.replace('%',''))}catch(e){}
     var tg=isNaN(mv)?'tgy':mv<0?'tgr':mv<8?'tgy':'tgg';
     var ic=isNaN(mv)?'?':mv<0?'!!':'~';
-    html+='<tr><td style="color:#8b90a0;font-size:10px">'+s.p+'</td><td><b>'+s.sku+'</b></td><td style="font-size:10px;color:#8b90a0">'+(s.asin||'')+'</td><td>'+s.name+'</td><td>'+s.o.toLocaleString()+'</td><td>$'+s.s.toLocaleString()+'</td><td>$'+s.ad.toLocaleString()+'</td><td>'+(s.acos||'N/A')+'</td><td>'+(s.tacos||'N/A')+'</td><td>'+(s.cvr||'N/A')+'</td><td>'+(s.ad_cvr||'N/A')+'</td><td>'+(s.nat_cvr||'N/A')+'</td><td><span class="tag '+tg+'">'+s.margin+'</span></td><td>'+(s.bsr||'N/A')+'</td><td style="color:'+(isNaN(mv)?'#8b90a0':mv<0?'#ef4444':mv<8?'#f59e0b':'#22c55e')+'">'+ic+'</td></tr>';
+    html+='<tr><td style="color:#8b90a0;font-size:10px">'+s.p+'</td><td><b>'+s.sku+'</b></td><td style="font-size:10px;color:#8b90a0">'+(s.asin||'')+'</td><td>'+s.name+'</td><td>'+s.o.toLocaleString()+'</td><td>$'+s.s.toLocaleString()+'</td><td>$'+s.ad.toLocaleString()+'</td><td>'+(s.acos||'N/A')+'</td><td>'+(s.tacos||'N/A')+'</td><td>'+(s.cvr||'N/A')+'</td><td>'+(s.ad_cvr||s.acvr||'N/A')+'</td><td>'+(s.nat_cvr||s.ncvr||'N/A')+'</td><td><span class="tag '+tg+'">'+s.margin+'</span></td><td>'+(s.settle_margin||'N/A')+'</td><td>'+(s.bsr||'N/A')+'</td><td style="color:'+(isNaN(mv)?'#8b90a0':mv<0?'#ef4444':mv<8?'#f59e0b':'#22c55e')+'">'+ic+'</td></tr>';
   });
   document.getElementById('skuTbody').innerHTML=html;
 }
@@ -1155,7 +1155,7 @@ html_parts.append('''</style>
       <div style="padding:4px 14px 12px">
         <div class="table-wrap">
           <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:700;color:#fff;margin:0">22个SKU明细</span><span style="font-size:10px;color:#8b90a0">绿>=15% 黄0~15% 红<0%</span></div>
-          <div class="table-scroll"><table><thead><tr><th>父ASIN</th><th>SKU</th><th>ASIN</th><th>品名</th><th>销量</th><th>销售额</th><th>广告费</th><th>ACoS</th><th>TACoS</th><th>CVR</th><th>广告CVR</th><th>自然CVR</th><th>毛利率</th><th>BSR</th><th>状态</th></tr></thead><tbody id="skuTbody"></tbody></table></div>
+          <div class="table-scroll"><table><thead><tr><th>父ASIN</th><th>SKU</th><th>ASIN</th><th>品名</th><th>销量</th><th>销售额</th><th>广告费</th><th>ACoS</th><th>TACoS</th><th>CVR</th><th>广告CVR</th><th>自然CVR</th><th>订单毛利率</th><th>结算毛利率</th><th>BSR</th><th>状态</th></tr></thead><tbody id="skuTbody"></tbody></table></div>
         </div>
       </div>
     </div>
