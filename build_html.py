@@ -287,6 +287,7 @@ var curTab = DEFAULT_TAB;
 // ===== TODO SYSTEM (BHTZ-style, dual week/month) =====
 var weekTodos=[], monthTodos=[];
 var weekTodoFilter='all', monthTodoFilter='all';
+var TODO_VER = 'v4';
 
 function tLoad(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}}
 function tSave(k,d){try{localStorage.setItem(k,JSON.stringify(d))}catch(e){}}
@@ -459,8 +460,10 @@ function attachTodoEvents(listId,todosRef,storageKey){
     if(srcId===dstId||tDescendant(todosRef,srcId,dstId))return;
     var src=tFind(todosRef,srcId),dst=tFind(todosRef,dstId);
     if(!src||!dst)return;
+    var sameParent=src.parent===dst.parent;
     src.parent.splice(src.index,1);
-    var fi=dst.index;if(tgt.classList.contains('drag-below'))fi++;
+    var fi=sameParent&&src.index<dst.index?dst.index-1:dst.index;
+    if(tgt.classList.contains('drag-below'))fi++;
     dst.parent.splice(fi,0,src.item);
     tSave(storageKey,todosRef);renderAllTodos();
   });
@@ -478,6 +481,13 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
 }
 
 function initTodos(){
+  var storedVer=localStorage.getItem('bht_todo_ver');
+  if(storedVer!==TODO_VER){
+    // Version changed: reset to current data-driven defaults (syncs across devices)
+    localStorage.removeItem('bht_week_todos_v2');
+    localStorage.removeItem('bht_month_todos_v2');
+    localStorage.setItem('bht_todo_ver',TODO_VER);
+  }
   weekTodos=tLoad('bht_week_todos_v2');monthTodos=tLoad('bht_month_todos_v2');
   // Generate defaults if empty
   if(!weekTodos.length&&window._lastWd){
@@ -555,6 +565,7 @@ function initDragDrop(){
   if(!container) return;
   var dragged=null;
   container.addEventListener('dragstart',function(e){
+    if(!e.target.closest('.drag-handle')) return;
     var wrap=e.target.closest('.section-wrap');
     if(!wrap) return;
     dragged=wrap;wrap.classList.add('dragging');
@@ -562,17 +573,20 @@ function initDragDrop(){
     e.dataTransfer.setData('text/plain','');
   });
   container.addEventListener('dragover',function(e){
+    if(!dragged) return;
     e.preventDefault();
     e.dataTransfer.dropEffect='move';
     var wrap=e.target.closest('.section-wrap');
     if(wrap&&wrap!==dragged) wrap.classList.add('drag-over');
   });
   container.addEventListener('dragleave',function(e){
+    if(!dragged) return;
     var wrap=e.target.closest('.section-wrap');
     // Only remove highlight when truly leaving the section, not when entering a child
     if(wrap&&!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');
   });
   container.addEventListener('drop',function(e){
+    if(!dragged) return;
     e.preventDefault();
     var wrap=e.target.closest('.section-wrap');
     if(wrap&&dragged&&wrap!==dragged){
@@ -600,6 +614,12 @@ function loadSectionOrder(){
   if(!order.length) return;
   var container=document.getElementById('sectionContainer');
   if(!container) return;
+  // Validate: order must contain exactly the same sections as current DOM
+  var currentIds=[];
+  container.querySelectorAll('.section-wrap').forEach(function(w){currentIds.push(w.dataset.section)});
+  if(order.length!==currentIds.length||order.some(function(id){return currentIds.indexOf(id)===-1})){
+    return; // Use default DOM order, saved order is stale
+  }
   order.forEach(function(id){
     var el=container.querySelector('[data-section="'+id+'"]');
     if(el) container.appendChild(el);

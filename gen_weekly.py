@@ -77,7 +77,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
     sales = sum(abs(n(v)) for v in grp.iloc[:,13])
     orders = int(sum(abs(n(v)) for v in grp.iloc[:,11]))  # col[11]=销量
     ad = sum(abs(n(v)) for v in grp.iloc[:,21])
-    ad_sales = sum(abs(n(v)) for v in grp.iloc[:,14]) if grp.shape[1] > 14 else 0
+    ad_sales = sum(abs(n(v)) for v in grp.iloc[:,22]) if grp.shape[1] > 22 else 0
     sessions = int(sum(abs(n(v)) for v in grp.iloc[:,8])) if grp.shape[1] > 8 else 0
     # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) 加权平均
     profit = sum(n(v) for v in grp.iloc[:,16])
@@ -142,8 +142,8 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
         # TACoS: computed from weekly totals
         sku_tacos = round(a_total/s_total*100, 2) if s_total > 0 else 0
 
-        # ACOS: from ad_spend / ad_sales (col 14 = 广告销售额)
-        ad_sales_total = sum(abs(n(v)) for v in sgrp.iloc[:,14]) if sgrp.shape[1] > 14 else 0
+        # ACOS: from ad_spend / ad_sales (col 22 = 广告销售额)
+        ad_sales_total = sum(abs(n(v)) for v in sgrp.iloc[:,22]) if sgrp.shape[1] > 22 else 0
         sku_acos = round(a_total/ad_sales_total*100, 2) if ad_sales_total > 0 else 0
 
         # BSR (小类排名 col[10]): text like "Butt Terminals：9", extract category + rank
