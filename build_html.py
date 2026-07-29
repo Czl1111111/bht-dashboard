@@ -172,8 +172,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
 .dy{background:#f59e0b;box-shadow:0 0 6px #f59e0b88}
 .dn{background:#6b7280;box-shadow:0 0 6px #6b728088}
 .charts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(430px,1fr));gap:12px;margin-bottom:14px}
-.chart-panel{background:#161822;border:1px solid #232638;border-radius:10px;padding:16px}
+.chart-panel{background:#161822;border:1px solid #232638;border-radius:10px;padding:16px;min-width:320px}
 .chart-panel h3{font-size:13px;color:#fff;margin-bottom:12px;font-weight:600}
+@media(max-width:900px){.charts-row{display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;padding-bottom:6px}.charts-row::-webkit-scrollbar{height:4px}.charts-row::-webkit-scrollbar-thumb{background:#2a2d3e;border-radius:2px}.chart-panel{flex:0 0 85vw;scroll-snap-align:start}}
 canvas{max-height:300px}
 .section-title{font-size:15px;font-weight:700;color:#fff;margin:16px 0 10px}
 .alert-item{background:#1a1c2a;border-left:4px solid #ef4444;border-radius:0 10px 10px 0;padding:10px 14px;margin-bottom:6px;display:flex;gap:8px;align-items:flex-start}

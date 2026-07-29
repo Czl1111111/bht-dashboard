@@ -72,7 +72,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
     dmax = str(dates.max())[:10]
 
     sales = sum(abs(n(v)) for v in grp.iloc[:,13])
-    orders = int(sum(abs(n(v)) for v in grp.iloc[:,12]))
+    orders = int(sum(abs(n(v)) for v in grp.iloc[:,11]))  # col[11]=销量
     ad = sum(abs(n(v)) for v in grp.iloc[:,21])
     ad_sales = sum(abs(n(v)) for v in grp.iloc[:,14]) if grp.shape[1] > 14 else 0
     sessions = int(sum(abs(n(v)) for v in grp.iloc[:,8])) if grp.shape[1] > 8 else 0
@@ -92,7 +92,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
     for pid in ['B09N9815DF','B0C3QMWY9K','B09G9RL5D3','B0FN7BFHQY']:
         sub = grp[grp[sku_col].map(lambda x: PMAP.get(x,'')) == pid]
         ps = sum(abs(n(v)) for v in sub.iloc[:,13])
-        po = int(sum(abs(n(v)) for v in sub.iloc[:,12]))
+        po = int(sum(abs(n(v)) for v in sub.iloc[:,11]))  # col[11]=销量
         pa = sum(abs(n(v)) for v in sub.iloc[:,21])
         pp = sum(n(v) for v in sub.iloc[:,16])
         pwms = 0.0
@@ -114,7 +114,7 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
     sku_groups = grp.groupby(sku_col)
     for sku, sgrp in sku_groups:
         s_total = sum(abs(n(v)) for v in sgrp.iloc[:,13])
-        o_total = int(sum(abs(n(v)) for v in sgrp.iloc[:,12]))
+        o_total = int(sum(abs(n(v)) for v in sgrp.iloc[:,11]))  # col[11]=销量
         a_total = sum(abs(n(v)) for v in sgrp.iloc[:,21])
         # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) 加权平均
         p_total = sum(n(v) for v in sgrp.iloc[:,16])
