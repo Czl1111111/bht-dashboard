@@ -231,7 +231,7 @@ tbody tr:hover{background:#1a1c2a}
 .todo-item .lv-btn.urgent{color:#ef4444;border-color:#ef444466}
 .todo-item .lv-btn.important{color:#f59e0b;border-color:#f59e0b66}
 .todo-item .lv-btn.normal{color:#22c55e;border-color:#22c55e66}
-.todo-item .todo-text{flex:1;font-size:11px;color:#e2e4ea;outline:none;padding:2px 4px;border-radius:3px;min-width:0;word-break:break-word}
+.todo-item .todo-text{flex:1;font-size:11px;color:#e2e4ea;outline:none;padding:2px 4px;border-radius:3px;min-width:60px;word-break:break-word}
 .todo-item .todo-text:focus{background:#161822}
 .todo-item .todo-text:empty:before{content:'点击输入...';color:#4a4d5e}
 .todo-item .sub-btn{flex-shrink:0;cursor:pointer;font-size:9px;padding:2px 4px;border-radius:3px;border:1px solid #2a2d3e;background:#161822;color:#6b7280;font-family:inherit;white-space:nowrap}
@@ -548,12 +548,18 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
 
 function initTodos(){
   // Load existing todos — never auto-wipe on version change
-  // (old behavior deleted user manual edits, now version is informational only)
   if(!localStorage.getItem('bht_todo_ver')){
     localStorage.setItem('bht_todo_ver',TODO_VER);
   }
   weekTodos=tLoad('bht_week_todos_v2');monthTodos=tLoad('bht_month_todos_v2');
-  // Generate defaults if empty
+  // Fallback: use embedded snapshot if localStorage is empty (cross-origin fresh visit)
+  if(!weekTodos.length&&window._EMBEDDED_WEEK&&window._EMBEDDED_WEEK.length){
+    weekTodos=window._EMBEDDED_WEEK;tSave('bht_week_todos_v2',weekTodos);
+  }
+  if(!monthTodos.length&&window._EMBEDDED_MONTH&&window._EMBEDDED_MONTH.length){
+    monthTodos=window._EMBEDDED_MONTH;tSave('bht_month_todos_v2',monthTodos);
+  }
+  // Generate defaults if still empty
   if(!weekTodos.length&&window._lastWd){
     weekTodos=genDefaults(false,window._lastWd);tSave('bht_week_todos_v2',weekTodos);
   }
@@ -1111,6 +1117,19 @@ loadSectionOrder();
 initDragDrop();
 '''
 
+# ===== Load embedded todo data =====
+TODO_DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'todo_data.json')
+embedded_week_json = 'null'
+embedded_month_json = 'null'
+if os.path.exists(TODO_DATA_FILE):
+    try:
+        with open(TODO_DATA_FILE, 'r', encoding='utf-8') as f:
+            todo_data = json.load(f)
+        embedded_week_json = json.dumps(todo_data.get('week', []))
+        embedded_month_json = json.dumps(todo_data.get('month', []))
+    except Exception:
+        pass
+
 # ===== Assemble final HTML =====
 html_parts = []
 html_parts.append('''<!DOCTYPE html>
@@ -1261,6 +1280,13 @@ js = js.replace('__DEFAULT_TAB__', default_tab)
 js = js.replace('__MONTH_BOUNDARIES__', json.dumps(month_boundaries))
 
 html_parts.append(js)
+ed = '''
+window._EMBEDDED_WEEK = __EMBEDDED_WEEK__;
+window._EMBEDDED_MONTH = __EMBEDDED_MONTH__;
+'''
+ed = ed.replace('__EMBEDDED_WEEK__', embedded_week_json)
+ed = ed.replace('__EMBEDDED_MONTH__', embedded_month_json)
+html_parts.append(ed)
 html_parts.append('''
 </script>
 </body>
