@@ -1,0 +1,409 @@
+{
+  "week": [
+    {
+      "id": 1021,
+      "text": "上周 整体目标:",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 1035,
+          "text": "利润率达8% (上周7.67%)",
+          "priority": "urgent",
+          "children": [
+            {
+              "id": 1023,
+              "text": "相差0.33%，上周因为在做盒装在做BD，利润会上去一些，袋装和瓶装的销量也在往上走，截止到月底，这个目标可以完成",
+              "priority": "urgent",
+              "children": [
+                {
+                  "id": 1024,
+                  "text": "1. HX1234（最大问题）— 广告费砍半 SP广告占比98%，CPC $3.46偏高 → 降低SP关键词竞价20-30% ACOS 30.19% → 否定无效搜索词，只保留转化词 自然CVR 73.2%很高，说明产品本身转化力强，减少广告后自然订单能补位 2. HX1233 — 广告费降41% ACOS 24.86%勉强可接受，但TACOS仍然超标 SP占92%，降低竞价 + 精准匹配关键词 自然CVR 43.24%，自然流量有潜力 3. HX1236 — 广告费降43% ACOS 21.12%尚可，但自然订单占比低 广告CVR 46.91% vs 自然CVR 28.24% → 广告转化反比自然好，说明listing需优化以提升自然转化 4. 4个达标SKU可适度加预算 HX1614/HX1615/HX1235/HX1616 当前TACOS极低（0.03%-0.29%） 合计有约 $262/月 的广告预算空间可加，不影响整体TACOS目标",
+                  "priority": "urgent",
+                  "children": [],
+                  "collapsed": true
+                }
+              ],
+              "collapsed": true,
+              "completed": false
+            },
+            {
+              "id": 1037,
+              "text": "盒装BHT的分析已给到",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true,
+              "completed": false
+            },
+            {
+              "id": 1036,
+              "text": "标题已全部做修改且成功",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true,
+              "completed": false
+            }
+          ],
+          "collapsed": true,
+          "completed": false
+        }
+      ],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 1003,
+      "text": "上周-紧急 HX1045(BHT盒装-330pcs) 亏损 -3.73% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 1025,
+          "text": "1. 在做BD，客单价下降，正常现象",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true,
+          "completed": false
+        },
+        {
+          "id": 1001,
+          "text": "2. 7.20-7.26这周的广告数据在变好，TACOS相比较上周下降了9个点，广告花费下降了10个点",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 1002,
+          "text": "3. 本周标题有修改，价格暂时不做调整",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 1009,
+      "text": "上周-紧急 HX2090(BHT-蓝黄盒子-520pcs) 亏损 -106.82% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 1007,
+          "text": "520BHT：降低TOS的BID+到0，减少广告花费，本周数据tacos依然很高是因为：直接订单的销售额＜间接订单的销售额",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 1008,
+          "text": "181-330天的库存有241件，要在三倍仓储费之前清完，日销4/单",
+          "priority": "urgent",
+          "children": [
+            {
+              "id": 1026,
+              "text": "1. 和330BHT/瓶装BHT做虚拟捆绑",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            },
+            {
+              "id": 1027,
+              "text": "2. 做小部件，放到瓶装BHT的下面",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            },
+            {
+              "id": 1028,
+              "text": "3. 做价格折扣，根据7.10-7.14的数据来看 520的广告数据最好，最近半个月的数据也看了，广告销售订单有，但是还需要新增 当前是三天一单，预计新增一个广告活动，RES-SP-BHT520-HX2090-词组-场景词 waterproof butt connectors automotive. marine electrical wire connectors, electrical wire crimp connectors, butt splice connectors heat shrink",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            },
+            {
+              "id": 1030,
+              "text": "620和420都有资格创建奥特莱斯，但是价格太低，420 奥特莱斯价格：19.99，原价39.99 620奥特莱斯价格：29.99，原价59.99",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            }
+          ],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 1006,
+      "text": "上周-紧急 HX2089(BHT盒装420pcs) 亏损 -32.33% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 1031,
+          "text": "181-330天的库存有109件，要在三倍仓储费之前清完，日销2/单",
+          "priority": "urgent",
+          "children": [
+            {
+              "id": 1032,
+              "text": "1. 和330BHT/瓶装BHT做虚拟捆绑",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            },
+            {
+              "id": 1033,
+              "text": "2. 做小部件，放到瓶装BHT的下面",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            },
+            {
+              "id": 1034,
+              "text": "3. 做价格折扣，根据7.10-7.14的数据来看 420的出单效果好，近半个月的优化效果也比较好，还是需要多出单，才能有利润，广告销售订单有，预计增加 marine grade butt connectors 词组广告，RES-SP-BHT420-HX2089-词组-船用，当前2/天",
+              "priority": "urgent",
+              "children": [],
+              "collapsed": true
+            }
+          ],
+          "collapsed": true
+        },
+        {
+          "id": 1004,
+          "text": "620和420都有资格创建奥特莱斯，但是价格太低，420 奥特莱斯价格：19.99，原价39.99 620阿特拉斯价格：29.99，原价59.99，不做",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 1014,
+      "text": "上周-重要 HX1616 广告ACoS 100.0%过高 - 优化广告投放",
+      "priority": "important",
+      "children": [
+        {
+          "id": 1013,
+          "text": "库存比较少，所以广告未开，正常现象",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 1039,
+      "text": "袋装BHT没有控制在6.5%",
+      "priority": "normal",
+      "children": [],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 1041,
+      "text": "",
+      "priority": "normal",
+      "children": [],
+      "collapsed": false,
+      "completed": false
+    },
+    {
+      "id": 1042,
+      "text": "",
+      "priority": "normal",
+      "children": [],
+      "collapsed": false,
+      "completed": false
+    }
+  ],
+  "month": [
+    {
+      "id": 2003,
+      "text": "月度-紧急 HX1045(BHT盒装-330pcs) 亏损 -4.4% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 2001,
+          "text": "分析成本构成: 采购/FBA/广告占比",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 2002,
+          "text": "对比竞品价格,判断提价空间",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true,
+      "completed": false
+    },
+    {
+      "id": 2006,
+      "text": "月度-紧急 HX2091(BHT-蓝黄盒子-620pcs) 亏损 -4.2% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 2004,
+          "text": "分析成本构成: 采购/FBA/广告占比",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 2005,
+          "text": "对比竞品价格,判断提价空间",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2009,
+      "text": "月度-紧急 HX2089(BHT-蓝黄盒子-420pcs) 亏损 -77.9% - 排查原因并优化",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 2007,
+          "text": "分析成本构成: 采购/FBA/广告占比",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 2008,
+          "text": "对比竞品价格,判断提价空间",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2011,
+      "text": "月度-重要 HX1053 广告ACoS 36.1%过高 - 优化广告投放",
+      "priority": "important",
+      "children": [
+        {
+          "id": 2010,
+          "text": "筛选ACoS>40%关键词降bid或否定",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2013,
+      "text": "月度-重要 HX1820 广告ACoS 35.1%过高 - 优化广告投放",
+      "priority": "important",
+      "children": [
+        {
+          "id": 2012,
+          "text": "筛选ACoS>40%关键词降bid或否定",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2015,
+      "text": "月度-重要 HX1615 广告ACoS 3475.0%过高 - 优化广告投放",
+      "priority": "important",
+      "children": [
+        {
+          "id": 2014,
+          "text": "筛选ACoS>40%关键词降bid或否定",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2017,
+      "text": "月度-重要 HX1235 广告ACoS 81.8%过高 - 优化广告投放",
+      "priority": "important",
+      "children": [
+        {
+          "id": 2016,
+          "text": "筛选ACoS>40%关键词降bid或否定",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2019,
+      "text": "月度-重要 HX2090 CVR仅1.5% - Listing优化提转化",
+      "priority": "important",
+      "children": [
+        {
+          "id": 2018,
+          "text": "检查主图/标题/五点/A+页面",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2020,
+      "text": "月度 整体目标: 利润率达8% (上周7.6%)",
+      "priority": "urgent",
+      "children": [
+        {
+          "id": 2021,
+          "text": "审查广告预算分配,控制TACoS",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true
+        },
+        {
+          "id": 2022,
+          "text": "排查高退款率SKU,优化品质/包装",
+          "priority": "important",
+          "children": [],
+          "collapsed": true
+        }
+      ],
+      "collapsed": true
+    },
+    {
+      "id": 2023,
+      "text": "8月规划: 补货计划(检查库存覆盖天数)",
+      "priority": "important",
+      "children": [],
+      "collapsed": true
+    },
+    {
+      "id": 2024,
+      "text": "8月目标: 保持BSR排名,利润率冲刺9%",
+      "priority": "normal",
+      "children": [],
+      "collapsed": true
+    },
+    {
+      "id": 2025,
+      "text": "",
+      "priority": "normal",
+      "children": [],
+      "collapsed": false,
+      "completed": false
+    }
+  ]
+}
