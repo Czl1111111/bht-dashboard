@@ -109,6 +109,10 @@ tbody tr:hover{background:#1a1c2a}
 .todo-item .del-btn{font-size:11px;cursor:pointer;color:#6b7280;padding:2px 4px;border:none;background:none;flex-shrink:0;opacity:.4;line-height:1}
 .todo-item .del-btn:hover{opacity:1;color:#ef4444}
 .todo-item .child-count{font-size:9px;color:#6b7280}
+.todo-item .check-btn{flex-shrink:0;cursor:pointer;font-size:14px;padding:0 2px;border:none;background:none;color:#6b7280;line-height:1;transition:all .15s;user-select:none}
+.todo-item .check-btn:hover{color:#22c55e}
+.todo-item.completed .todo-text{text-decoration:line-through;color:#5a5d6e}
+.todo-item.completed .check-btn{color:#22c55e}
 .todo-add-wrap{margin-top:6px}
 .todo-add-wrap button{font-size:11px;padding:5px 12px;border-radius:5px;border:1px dashed #2a2d3e;background:transparent;color:#8b90a0;cursor:pointer;font-family:inherit;width:100%;text-align:center;transition:all .15s}
 .todo-add-wrap button:hover{background:#1e2030;color:#fff;border-color:#7c3aed}
@@ -320,7 +324,7 @@ function importTodos(storageKey){
             var parts=lines[i].match(/([^,]*),(\d*),\"((?:[^\"]|\"\")*)\",(\d*)/);
             if(!parts) continue;
             var lvl=parseInt(parts[2])||0, txt=parts[3].replace(/\"\"/g,'\"'), childCount=parseInt(parts[4])||0;
-            var item={id:++nextId,text:txt,priority:parts[1]==='紧急'?'urgent':(parts[1]==='重要'?'important':'normal'),children:[],collapsed:false};
+            var item={id:++nextId,text:txt,priority:parts[1]==='紧急'?'urgent':(parts[1]==='重要'?'important':'normal'),children:[],collapsed:false,completed:false};
             while(stack.length>lvl) stack.pop();
             if(stack.length===0) roots.push(item);
             else{var p=stack[stack.length-1];p.children.push(item);p.collapsed=false}
@@ -368,25 +372,25 @@ function genDefaults(isMonth,wd){
   function add(arr,prio,prefix,items){
     items.forEach(function(x){
       var txt='';var sub=[];
-      if(x.margin<0){txt=prefix+' '+x.sku+'('+x.name+') 亏损 '+x.margin.toFixed(1)+'% - 排查原因并优化';sub.push({id:++id,text:'分析成本构成: 采购/FBA/广告占比',priority:prio,children:[]});sub.push({id:++id,text:'对比竞品价格,判断提价空间',priority:prio,children:[]});}
-      else if(x.acos>35){txt=prefix+' '+x.sku+' 广告ACoS '+x.acos.toFixed(1)+'%过高 - 优化广告投放';sub.push({id:++id,text:'筛选ACoS>40%关键词降bid或否定',priority:prio,children:[]});}
-      else if(x.cvr<12){txt=prefix+' '+x.sku+' CVR仅'+x.cvr.toFixed(1)+'% - Listing优化提转化';sub.push({id:++id,text:'检查主图/标题/五点/A+页面',priority:prio,children:[]});}
+      if(x.margin<0){txt=prefix+' '+x.sku+'('+x.name+') 亏损 '+x.margin.toFixed(1)+'% - 排查原因并优化';sub.push({id:++id,text:'分析成本构成: 采购/FBA/广告占比',priority:prio,children:[],completed:false});sub.push({id:++id,text:'对比竞品价格,判断提价空间',priority:prio,children:[],completed:false});}
+      else if(x.acos>35){txt=prefix+' '+x.sku+' 广告ACoS '+x.acos.toFixed(1)+'%过高 - 优化广告投放';sub.push({id:++id,text:'筛选ACoS>40%关键词降bid或否定',priority:prio,children:[],completed:false});}
+      else if(x.cvr<12){txt=prefix+' '+x.sku+' CVR仅'+x.cvr.toFixed(1)+'% - Listing优化提转化';sub.push({id:++id,text:'检查主图/标题/五点/A+页面',priority:prio,children:[],completed:false});}
       else {txt=prefix+' '+x.sku+' 利润率偏低 '+x.margin.toFixed(1)+'% - 持续关注';}
-      arr.push({id:++id,text:txt,priority:prio,children:sub,collapsed:false});
+      arr.push({id:++id,text:txt,priority:prio,children:sub,collapsed:false,completed:false});
     });
   }
   add(items,'urgent',isMonth?'月度-紧急':'上周-紧急',urgent);
   add(items,'important',isMonth?'月度-重要':'上周-重要',important);
-  if(!isMonth) normal.forEach(function(x){items.push({id:++id,text:'上周-普通 '+x.sku+' CVR仅'+x.cvr.toFixed(1)+'% - Listing优化提转化',priority:'normal',children:[{id:++id,text:'检查主图/标题/五点/A+页面',priority:'normal',children:[]}]})});
+  if(!isMonth) normal.forEach(function(x){items.push({id:++id,text:'上周-普通 '+x.sku+' CVR仅'+x.cvr.toFixed(1)+'% - Listing优化提转化',priority:'normal',children:[{id:++id,text:'检查主图/标题/五点/A+页面',priority:'normal',children:[],completed:false}],completed:false})});
   var pfx=isMonth?'月度':'上周';
   var srcNote=prevLabel?' (数据来源:'+prevLabel+')':'';
   items.push({id:++id,text:pfx+' 整体目标: 利润率达8% (上周'+wd.total.margin.toFixed(1)+'%)'+srcNote,priority:'urgent',children:[
-    {id:++id,text:'审查广告预算分配,控制TACoS',priority:'urgent',children:[]},
-    {id:++id,text:'排查高退款率SKU,优化品质/包装',priority:'important',children:[]}
-  ],collapsed:false});
+    {id:++id,text:'审查广告预算分配,控制TACoS',priority:'urgent',children:[],completed:false},
+    {id:++id,text:'排查高退款率SKU,优化品质/包装',priority:'important',children:[],completed:false}
+  ],collapsed:false,completed:false});
   if(isMonth){
-    items.push({id:++id,text:'8月规划: 补货计划(检查库存覆盖天数)',priority:'important',children:[]});
-    items.push({id:++id,text:'8月目标: 保持BSR排名,利润率冲刺9%',priority:'normal',children:[]});
+    items.push({id:++id,text:'8月规划: 补货计划(检查库存覆盖天数)',priority:'important',children:[],completed:false});
+    items.push({id:++id,text:'8月目标: 保持BSR排名,利润率冲刺9%',priority:'normal',children:[],completed:false});
   }
   return items;
 }
@@ -406,7 +410,9 @@ function renderTodoList(listId,todos,filter){
   var el=document.getElementById(listId);if(!el)return'';
   var flat=tFlatten(todos,0,filter);
   var h='';flat.forEach(function(t){
-    h+='<div class=\"todo-item lv-'+t.level+' lv-'+t.priority+'\" data-tid=\"'+t.id+'\" data-tl=\"'+t.level+'\">';
+    var ccls=(t.completed?' completed':'');
+    h+='<div class=\"todo-item lv-'+t.level+' lv-'+t.priority+ccls+'\" data-tid=\"'+t.id+'\" data-tl=\"'+t.level+'\">';
+    h+='<button class=\"check-btn\" data-action=\"check\" data-tid=\"'+t.id+'\">'+(t.completed?'☑':'☐')+'</button>';
     h+='<span class=\"grip\" draggable=\"true\">⠿</span>';
     if(t.hasChildren) h+='<button class=\"fold-tgl\" data-action=\"fold\" data-tid=\"'+t.id+'\">'+(t.collapsed?'▶':'▼')+'</button>';
     else h+='<span class=\"fold-spacer\"></span>';
@@ -439,7 +445,9 @@ function attachTodoEvents(listId,todosRef,storageKey){
     } else if(act==='del'){
       var f=tFind(todosRef,id);if(f){f.parent.splice(f.index,1);tSave(storageKey,todosRef);renderAllTodos()}
     } else if(act==='child'){
-      var f=tFind(todosRef,id);if(f){if(!f.item.children)f.item.children=[];var nid=tMaxId(todosRef)+1;f.item.children.push({id:nid,text:'',priority:f.item.priority,children:[],collapsed:false});f.item.collapsed=false;tSave(storageKey,todosRef);renderAllTodos();setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50)}
+      var f=tFind(todosRef,id);if(f){if(!f.item.children)f.item.children=[];var nid=tMaxId(todosRef)+1;f.item.children.push({id:nid,text:'',priority:f.item.priority,children:[],collapsed:false,completed:false});f.item.collapsed=false;tSave(storageKey,todosRef);renderAllTodos();setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50)}
+    } else if(act==='check'){
+      var f=tFind(todosRef,id);if(f){f.item.completed=!f.item.completed;tSave(storageKey,todosRef);renderAllTodos()}
     }
   });
 
@@ -462,7 +470,7 @@ function attachTodoEvents(listId,todosRef,storageKey){
     if(e.key==='Enter'){
       e.preventDefault();
       var nid=tMaxId(todosRef)+1;
-      f.parent.splice(f.index+1,0,{id:nid,text:'',priority:f.item.priority,children:[],collapsed:false});
+      f.parent.splice(f.index+1,0,{id:nid,text:'',priority:f.item.priority,children:[],collapsed:false,completed:false});
       tSave(storageKey,todosRef);renderAllTodos();
       setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50);
     } else if(e.key==='Tab'&&!e.shiftKey){
@@ -517,7 +525,7 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
   var btn=document.getElementById(btnId);if(!btn)return;
   btn.onclick=function(){
     var nid=tMaxId(todosRef)+1;
-    todosRef.push({id:nid,text:'',priority:'normal',children:[],collapsed:false});
+    todosRef.push({id:nid,text:'',priority:'normal',children:[],collapsed:false,completed:false});
     tSave(storageKey,todosRef);renderAllTodos();
     var listId=isMonth?'monthTodoList':'weekTodoList';
     setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50);
@@ -538,7 +546,7 @@ function initTodos(){
   if(!monthTodos.length){
     var mk=Object.keys(MONTHS_DATA).sort().pop();
     var md=mk?MONTHS_DATA[mk]:null;
-    if(md) monthTodos=genDefaults(true,{skus:md.skus,total:md.total});else monthTodos=[{id:2001,text:'月度 核验7月利润率是否达到8%目标',priority:'urgent',children:[],collapsed:false},{id:2002,text:'月度 8月广告预算规划',priority:'important',children:[]},{id:2003,text:'月度 供应商比价谈判(降低采购成本)',priority:'normal',children:[]}];
+    if(md) monthTodos=genDefaults(true,{skus:md.skus,total:md.total});else monthTodos=[{id:2001,text:'月度 核验7月利润率是否达到8%目标',priority:'urgent',children:[],collapsed:false,completed:false},{id:2002,text:'月度 8月广告预算规划',priority:'important',children:[],completed:false},{id:2003,text:'月度 供应商比价谈判(降低采购成本)',priority:'normal',children:[],completed:false}];
     tSave('bht_month_todos_v2',monthTodos);
   }
   renderAllTodos();
