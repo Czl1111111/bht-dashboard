@@ -302,6 +302,19 @@ var _GH_LAST_ETAG = null;
 function ghSetToken(tk){
   _GH_TOKEN = tk;
   localStorage.setItem('bht_gh_token',tk);
+  var st=document.getElementById('ghSyncStatus');
+  if(tk){
+    if(st)st.textContent='⏳ 同步中...';if(st)st.style.color='#f59e0b';
+    ghPull().then(function(d){
+      if(!d||d==='_unchanged_'){if(st)st.textContent='✅ 已连接';if(st)st.style.color='#22c55e';return}
+      if(d.week&&d.week.length){weekTodos=d.week;tSave('bht_week_todos_v2',weekTodos)}
+      if(d.month&&d.month.length){monthTodos=d.month;tSave('bht_month_todos_v2',monthTodos)}
+      renderAllTodos();
+      if(st)st.textContent='✅ 已同步';if(st)st.style.color='#22c55e';
+    }).catch(function(){if(st)st.textContent='❌ 连接失败';if(st)st.style.color='#ef4444'});
+  } else {
+    if(st)st.textContent='';if(st)st.style.color='';
+  }
   renderAllTodos();
 }
 
@@ -326,6 +339,7 @@ async function ghPull(){
 
 async function ghPush(weekData,monthData){
   if(!window._GH_TOKEN) return false;
+  var st=document.getElementById('ghSyncStatus');
   try{
     var getResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{headers:{Authorization:'Bearer '+window._GH_TOKEN}});
     var sha = getResp.ok ? (await getResp.json()).sha : null;
@@ -335,13 +349,16 @@ async function ghPush(weekData,monthData){
       method:'PUT',headers:{Authorization:'Bearer '+window._GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)
     });
     _GH_SYNC_DIRTY = false;
+    if(st){st.textContent=putResp.ok?'✅ 已同步':'❌ 同步失败';st.style.color=putResp.ok?'#22c55e':'#ef4444';}
     return putResp.ok;
-  }catch(e){_GH_SYNC_DIRTY = true; return false;}
+  }catch(e){_GH_SYNC_DIRTY = true;if(st){st.textContent='❌ 同步失败';st.style.color='#ef4444';}return false;}
 }
 
 function ghScheduleSync(){
   if(_GH_SYNC_TIMER) clearTimeout(_GH_SYNC_TIMER);
   _GH_SYNC_DIRTY = true;
+  var st=document.getElementById('ghSyncStatus');
+  if(st){st.textContent='⏳ 同步中...';st.style.color='#f59e0b';}
   _GH_SYNC_TIMER = setTimeout(function(){
     if(!_GH_SYNC_DIRTY) return;
     ghPush(weekTodos,monthTodos);
@@ -656,6 +673,13 @@ document.addEventListener('DOMContentLoaded',function(){
   setupAddButton('btn-add-month-todo',monthTodos,'bht_month_todos_v2',true);
   attachTodoEvents('weekTodoList',weekTodos,'bht_week_todos_v2');
   attachTodoEvents('monthTodoList',monthTodos,'bht_month_todos_v2');
+  // Fill saved token and show status
+  var ti=document.getElementById('ghTokenInput');
+  if(ti&&_GH_TOKEN)ti.value=_GH_TOKEN;
+  var st=document.getElementById('ghSyncStatus');
+  if(_GH_TOKEN){
+    if(st)st.textContent='✅ 已连接';if(st)st.style.color='#22c55e';
+  }
 });
 
 // ===== SECTION TOGGLE & DRAG =====
