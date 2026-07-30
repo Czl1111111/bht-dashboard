@@ -294,11 +294,16 @@ function ghSetToken(tk){
   localStorage.setItem('bht_gh_token',tk);
   var st=document.getElementById('ghSyncStatus');
   if(tk){
-    if(st)st.textContent='⏳ 测试连接...';if(st)st.style.color='#f59e0b';
-    // Test connectivity first
-    fetch('https://api.github.com/repos/Czl1111111/bht-dashboard',{headers:{Authorization:'Bearer '+tk}}).then(function(r){
-      if(!r.ok) throw new Error('auth '+r.status);
-      if(st)st.textContent='⏳ 推送中...';
+    if(st)st.textContent='⏳ 测试中...';if(st)st.style.color='#f59e0b';
+    // Step 1: test public connectivity
+    fetch('https://api.github.com/zen',{cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('GitHub不可达');
+      // Step 2: test auth
+      return fetch('https://api.github.com/user',{headers:{Authorization:'Bearer '+tk}});
+    }).then(function(r){
+      if(r.status===401) throw new Error('Token无效');
+      if(!r.ok) throw new Error('API错误 '+r.status);
+      if(st)st.textContent='⏳ 推送...';
       return ghPush(weekTodos,monthTodos);
     }).then(function(){
       if(st)st.textContent='✅ 已同步';if(st)st.style.color='#22c55e';
