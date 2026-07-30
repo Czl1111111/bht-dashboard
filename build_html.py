@@ -294,10 +294,16 @@ var weekTodoFilter='all', monthTodoFilter='all';
 var TODO_VER = 'v7';
 
 // ===== GitHub Sync =====
-var _GH_TOKEN = '__GH_TOKEN__';
+var _GH_TOKEN = localStorage.getItem('bht_gh_token')||'';
 var _GH_SYNC_TIMER = null;
 var _GH_SYNC_DIRTY = false;
 var _GH_LAST_ETAG = null;
+
+function ghSetToken(tk){
+  _GH_TOKEN = tk;
+  localStorage.setItem('bht_gh_token',tk);
+  renderAllTodos();
+}
 
 function _ghContent(json){
   return btoa(unescape(encodeURIComponent(JSON.stringify(json,null,2))));
@@ -1194,8 +1200,7 @@ if os.path.exists(TODO_DATA_FILE):
     except Exception:
         pass
 
-# ===== GitHub Token (from env var, never committed) =====
-github_token = os.environ.get('BHT_GITHUB_TOKEN', '')
+# ===== GitHub Token (stored in browser localStorage by user, never in source) =====
 
 # ===== Assemble final HTML =====
 html_parts = []
@@ -1303,7 +1308,8 @@ html_parts.append('''</style>
       </div>
     </div>
   </div>
-  <!-- 5. HX1045专项优化 -->
+      <div class="todo-wrap" style="margin-top:14px;padding-top:12px;border-top:1px solid #232638"><div class="todo-hdr" style="margin-bottom:6px"><h4 style="font-size:11px;color:#6b7280">🔑 GitHub 同步设置</h4><span id="ghSyncStatus" style="font-size:10px;color:#22c55e"></span></div><div style="display:flex;gap:6px"><input id="ghTokenInput" type="password" placeholder="输入 GitHub Token 启用跨设备同步..." style="flex:1;background:#1a1c2a;border:1px solid #2a2d3e;border-radius:4px;padding:6px 10px;color:#e2e4ea;font-size:11px;font-family:inherit;outline:none"><button class="todo-fold-btn" onclick="ghSetToken(document.getElementById('ghTokenInput').value)" style="white-space:nowrap">💾 保存</button><button class="todo-fold-btn" onclick="ghSetToken('');document.getElementById('ghTokenInput').value=''" style="white-space:nowrap;margin-left:4px">✕ 清除</button></div><div style="font-size:9px;color:#4a4d5e;margin-top:4px">创建 Token: GitHub Settings → Developer settings → Tokens (classic) → 勾选 repo → 复制粘贴到这里</div></div>
+<!-- 5. HX1045专项优化 -->
   <div class="section-wrap" data-section="hxplan">
     <div class="section-header">
       <span class="drag-handle" draggable="true">⠿</span>
@@ -1345,7 +1351,6 @@ js = js.replace('__WEEKLY_DATA__', weekly_json)
 js = js.replace('__WEEKS__', weeks_json)
 js = js.replace('__DEFAULT_TAB__', default_tab)
 js = js.replace('__MONTH_BOUNDARIES__', json.dumps(month_boundaries))
-js = js.replace('__GH_TOKEN__', github_token)
 
 html_parts.append(js)
 ed = '''
