@@ -295,14 +295,8 @@ function ghSetToken(tk){
   tk = _GH_TOKEN;
   var st=document.getElementById('ghSyncStatus');
   if(tk){
-    if(st)st.textContent='⏳ 测试中...';if(st)st.style.color='#f59e0b';
-    // Step 1: test public connectivity + auth with repo endpoint
-    fetch('https://api.github.com/repos/Czl1111111/bht-dashboard',{headers:{Authorization:'Bearer '+tk}}).then(function(r){
-      if(r.status===401) throw new Error('Token无效');
-      if(!r.ok) throw new Error('API错误 '+r.status);
-      if(st)st.textContent='⏳ 推送...';
-      return ghPush(weekTodos,monthTodos);
-    }).then(function(){
+    if(st)st.textContent='⏳ 推送中...';if(st)st.style.color='#f59e0b';
+    ghPush(weekTodos,monthTodos).then(function(){
       if(st)st.textContent='✅ 已同步';if(st)st.style.color='#22c55e';
     }).catch(function(e){
       if(st)st.textContent='❌ '+e.message;if(st)st.style.color='#ef4444';
