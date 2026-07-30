@@ -20,14 +20,14 @@
                   "text": "1. HX1234（最大问题）— 广告费砍半 SP广告占比98%，CPC $3.46偏高 → 降低SP关键词竞价20-30% ACOS 30.19% → 否定无效搜索词，只保留转化词 自然CVR 73.2%很高，说明产品本身转化力强，减少广告后自然订单能补位 2. HX1233 — 广告费降41% ACOS 24.86%勉强可接受，但TACOS仍然超标 SP占92%，降低竞价 + 精准匹配关键词 自然CVR 43.24%，自然流量有潜力 3. HX1236 — 广告费降43% ACOS 21.12%尚可，但自然订单占比低 广告CVR 46.91% vs 自然CVR 28.24% → 广告转化反比自然好，说明listing需优化以提升自然转化 4. 4个达标SKU可适度加预算 HX1614/HX1615/HX1235/HX1616 当前TACOS极低（0.03%-0.29%） 合计有约 $262/月 的广告预算空间可加，不影响整体TACOS目标",
                   "priority": "urgent",
                   "children": [],
-                  "collapsed": true
+                  "collapsed": false
                 }
               ],
-              "collapsed": true,
+              "collapsed": false,
               "completed": false
             }
           ],
-          "collapsed": true,
+          "collapsed": false,
           "completed": false
         },
         {
@@ -35,7 +35,7 @@
           "text": "标题已全部做修改且成功",
           "priority": "urgent",
           "children": [],
-          "collapsed": true,
+          "collapsed": false,
           "completed": false
         },
         {
@@ -43,7 +43,7 @@
           "text": "盒装BHT的分析已给到",
           "priority": "urgent",
           "children": [],
-          "collapsed": true,
+          "collapsed": false,
           "completed": false
         }
       ],
@@ -60,7 +60,7 @@
           "text": "1. 在做BD，客单价下降，正常现象",
           "priority": "urgent",
           "children": [],
-          "collapsed": true,
+          "collapsed": false,
           "completed": false
         },
         {
@@ -68,17 +68,17 @@
           "text": "2. 7.20-7.26这周的广告数据在变好，TACOS相比较上周下降了9个点，广告花费下降了10个点",
           "priority": "urgent",
           "children": [],
-          "collapsed": true
+          "collapsed": false
         },
         {
           "id": 1002,
           "text": "3. 本周标题有修改，价格暂时不做调整",
           "priority": "urgent",
           "children": [],
-          "collapsed": true
+          "collapsed": false
         }
       ],
-      "collapsed": true,
+      "collapsed": false,
       "completed": false
     },
     {
@@ -91,7 +91,7 @@
           "text": "520BHT：降低TOS的BID+到0，减少广告花费，本周数据tacos依然很高是因为：直接订单的销售额＜间接订单的销售额",
           "priority": "urgent",
           "children": [],
-          "collapsed": true
+          "collapsed": false
         },
         {
           "id": 1008,
@@ -103,34 +103,34 @@
               "text": "1. 和330BHT/瓶装BHT做虚拟捆绑",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             },
             {
               "id": 1027,
               "text": "2. 做小部件，放到瓶装BHT的下面",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             },
             {
               "id": 1028,
               "text": "3. 做价格折扣，根据7.10-7.14的数据来看 520的广告数据最好，最近半个月的数据也看了，广告销售订单有，但是还需要新增 当前是三天一单，预计新增一个广告活动，RES-SP-BHT520-HX2090-词组-场景词 waterproof butt connectors automotive. marine electrical wire connectors, electrical wire crimp connectors, butt splice connectors heat shrink",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             },
             {
               "id": 1030,
               "text": "620和420都有资格创建奥特莱斯，但是价格太低，420 奥特莱斯价格：19.99，原价39.99 620奥特莱斯价格：29.99，原价59.99",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             }
           ],
-          "collapsed": true
+          "collapsed": false
         }
       ],
-      "collapsed": true,
+      "collapsed": false,
       "completed": false
     },
     {
@@ -148,34 +148,34 @@
               "text": "1. 和330BHT/瓶装BHT做虚拟捆绑",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             },
             {
               "id": 1033,
               "text": "2. 做小部件，放到瓶装BHT的下面",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             },
             {
               "id": 1034,
               "text": "3. 做价格折扣，根据7.10-7.14的数据来看 420的出单效果好，近半个月的优化效果也比较好，还是需要多出单，才能有利润，广告销售订单有，预计增加 marine grade butt connectors 词组广告，RES-SP-BHT420-HX2089-词组-船用，当前2/天",
               "priority": "urgent",
               "children": [],
-              "collapsed": true
+              "collapsed": false
             }
           ],
-          "collapsed": true
+          "collapsed": false
         },
         {
           "id": 1004,
           "text": "620和420都有资格创建奥特莱斯，但是价格太低，420 奥特莱斯价格：19.99，原价39.99 620阿特拉斯价格：29.99，原价59.99，不做",
           "priority": "urgent",
           "children": [],
-          "collapsed": true
+          "collapsed": false
         }
       ],
-      "collapsed": true
+      "collapsed": false
     },
     {
       "id": 1014,
@@ -187,10 +187,10 @@
           "text": "库存比较少，所以广告未开，正常现象",
           "priority": "important",
           "children": [],
-          "collapsed": true
+          "collapsed": false
         }
       ],
-      "collapsed": true,
+      "collapsed": false,
       "completed": false
     },
     {
