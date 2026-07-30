@@ -502,11 +502,9 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
 }
 
 function initTodos(){
-  var storedVer=localStorage.getItem('bht_todo_ver');
-  if(storedVer!==TODO_VER){
-    // Version changed: reset to current data-driven defaults (syncs across devices)
-    localStorage.removeItem('bht_week_todos_v2');
-    localStorage.removeItem('bht_month_todos_v2');
+  // Load existing todos — never auto-wipe on version change
+  // (old behavior deleted user manual edits, now version is informational only)
+  if(!localStorage.getItem('bht_todo_ver')){
     localStorage.setItem('bht_todo_ver',TODO_VER);
   }
   weekTodos=tLoad('bht_week_todos_v2');monthTodos=tLoad('bht_month_todos_v2');
@@ -515,7 +513,6 @@ function initTodos(){
     weekTodos=genDefaults(false,window._lastWd);tSave('bht_week_todos_v2',weekTodos);
   }
   if(!monthTodos.length){
-    // Use latest month data for defaults
     var mk=Object.keys(MONTHS_DATA).sort().pop();
     var md=mk?MONTHS_DATA[mk]:null;
     if(md) monthTodos=genDefaults(true,{skus:md.skus,total:md.total});else monthTodos=[{id:2001,text:'月度 核验7月利润率是否达到8%目标',priority:'urgent',children:[],collapsed:false},{id:2002,text:'月度 8月广告预算规划',priority:'important',children:[]},{id:2003,text:'月度 供应商比价谈判(降低采购成本)',priority:'normal',children:[]}];
