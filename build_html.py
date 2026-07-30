@@ -291,16 +291,69 @@ var curTab = DEFAULT_TAB;
 // ===== TODO SYSTEM (BHTZ-style, dual week/month) =====
 var weekTodos=[], monthTodos=[];
 var weekTodoFilter='all', monthTodoFilter='all';
-var TODO_VER = 'v6';
+var TODO_VER = 'v7';
+
+// ===== GitHub Sync =====
+var _GH_TOKEN = '__GH_TOKEN__';
+var _GH_SYNC_TIMER = null;
+var _GH_SYNC_DIRTY = false;
+var _GH_LAST_ETAG = null;
+
+function _ghContent(json){
+  return btoa(unescape(encodeURIComponent(JSON.stringify(json,null,2))));
+}
+
+async function ghPull(){
+  if(!window._GH_TOKEN||window._GH_TOKEN==='__GH_TOKEN__'||window._GH_TOKEN==='') return null;
+  try{
+    var headers = {Authorization:'Bearer '+window._GH_TOKEN};
+    if(_GH_LAST_ETAG) headers['If-None-Match'] = _GH_LAST_ETAG;
+    var r = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{cache:'no-store',headers:headers});
+    if(r.status===304) return '_unchanged_';
+    if(!r.ok) return null;
+    var j = await r.json();
+    _GH_LAST_ETAG = r.headers.get('ETag')||null;
+    var content = JSON.parse(decodeURIComponent(escape(atob(j.content))));
+    return content;
+  }catch(e){return null;}
+}
+
+async function ghPush(weekData,monthData){
+  if(!window._GH_TOKEN||window._GH_TOKEN==='__GH_TOKEN__'||window._GH_TOKEN==='') return false;
+  try{
+    var getResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{headers:{Authorization:'Bearer '+window._GH_TOKEN}});
+    var sha = getResp.ok ? (await getResp.json()).sha : null;
+    var body = {message:'sync: update todo data',content:_ghContent({week:weekData,month:monthData})};
+    if(sha) body.sha = sha;
+    var putResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{
+      method:'PUT',headers:{Authorization:'Bearer '+window._GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    _GH_SYNC_DIRTY = false;
+    return putResp.ok;
+  }catch(e){_GH_SYNC_DIRTY = true; return false;}
+}
+
+function ghScheduleSync(){
+  if(_GH_SYNC_TIMER) clearTimeout(_GH_SYNC_TIMER);
+  _GH_SYNC_DIRTY = true;
+  _GH_SYNC_TIMER = setTimeout(function(){
+    if(!_GH_SYNC_DIRTY) return;
+    ghPush(weekTodos,monthTodos);
+  },2000);
+}
 
 function tLoad(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch(e){return[]}}
 function tSave(k,d){try{localStorage.setItem(k,JSON.stringify(d))}catch(e){}}
+function tSaveSync(k,d){
+  tSave(k,d);
+  ghScheduleSync();
+}
 function tMaxId(arr){var m=0;function w(a){for(var i=0;i<a.length;i++){if(a[i].id>m)m=a[i].id;if(a[i].children)w(a[i].children)}}w(arr);return m}
 function tFind(arr,id){for(var i=0;i<arr.length;i++){if(arr[i].id===id)return{item:arr[i],parent:arr,index:i};if(arr[i].children&&arr[i].children.length>0){var f=tFind(arr[i].children,id);if(f)return f}}return null}
 function tDescendant(arr,aid,cid){var f=tFind(arr,aid);if(!f||!f.item.children)return false;for(var i=0;i<f.item.children.length;i++){if(f.item.children[i].id===cid)return true;if(tDescendant(f.item.children,f.item.children[i].id,cid))return true}return false}
 
 function tFoldAll(arr,collapsed){for(var i=0;i<arr.length;i++){arr[i].collapsed=collapsed;if(arr[i].children&&arr[i].children.length)tFoldAll(arr[i].children,collapsed)}}
-function toggleTodoFold(type,expand){var list=type==='week'?weekTodos:monthTodos;var key=type==='week'?'bht_week_todos_v2':'bht_month_todos_v2';tFoldAll(list,!expand);tSave(key,list);renderAllTodos()}
+function toggleTodoFold(type,expand){var list=type==='week'?weekTodos:monthTodos;var key=type==='week'?'bht_week_todos_v2':'bht_month_todos_v2';tFoldAll(list,!expand);tSaveSync(key,list);renderAllTodos()}
 function exportTodos(storageKey){
   var data=localStorage.getItem(storageKey);
   if(!data){alert('没有可导出的待办事项数据');return}
@@ -453,15 +506,15 @@ function attachTodoEvents(listId,todosRef,storageKey){
     if(!act) return;
     var id=parseInt(tgt.dataset.tid);
     if(act==='fold'){
-      var f=tFind(todosRef,id);if(f){f.item.collapsed=!f.item.collapsed;tSave(storageKey,todosRef);renderAllTodos()}
+      var f=tFind(todosRef,id);if(f){f.item.collapsed=!f.item.collapsed;tSaveSync(storageKey,todosRef);renderAllTodos()}
     } else if(act==='prio'){
-      var f=tFind(todosRef,id);if(f){var p=f.item.priority;f.item.priority=p==='urgent'?'important':(p==='important'?'normal':'urgent');tSave(storageKey,todosRef);renderAllTodos()}
+      var f=tFind(todosRef,id);if(f){var p=f.item.priority;f.item.priority=p==='urgent'?'important':(p==='important'?'normal':'urgent');tSaveSync(storageKey,todosRef);renderAllTodos()}
     } else if(act==='del'){
-      var f=tFind(todosRef,id);if(f){f.parent.splice(f.index,1);tSave(storageKey,todosRef);renderAllTodos()}
+      var f=tFind(todosRef,id);if(f){f.parent.splice(f.index,1);tSaveSync(storageKey,todosRef);renderAllTodos()}
     } else if(act==='child'){
-      var f=tFind(todosRef,id);if(f){if(!f.item.children)f.item.children=[];var nid=tMaxId(todosRef)+1;f.item.children.push({id:nid,text:'',priority:f.item.priority,children:[],collapsed:false,completed:false});f.item.collapsed=false;tSave(storageKey,todosRef);renderAllTodos();setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50)}
+      var f=tFind(todosRef,id);if(f){if(!f.item.children)f.item.children=[];var nid=tMaxId(todosRef)+1;f.item.children.push({id:nid,text:'',priority:f.item.priority,children:[],collapsed:false,completed:false});f.item.collapsed=false;tSaveSync(storageKey,todosRef);renderAllTodos();setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50)}
     } else if(act==='check'){
-      var f=tFind(todosRef,id);if(f){f.item.completed=!f.item.completed;tSave(storageKey,todosRef);renderAllTodos()}
+      var f=tFind(todosRef,id);if(f){f.item.completed=!f.item.completed;tSaveSync(storageKey,todosRef);renderAllTodos()}
     }
   });
 
@@ -470,7 +523,7 @@ function attachTodoEvents(listId,todosRef,storageKey){
     if(e.target.classList.contains('todo-text')){
       var id=parseInt(e.target.dataset.tid);
       var f=tFind(todosRef,id);
-      if(f){f.item.text=dText(e.target.innerText)||f.item.text;tSave(storageKey,todosRef)}
+      if(f){f.item.text=dText(e.target.innerText)||f.item.text;tSaveSync(storageKey,todosRef)}
     }
   },true);
 
@@ -485,19 +538,19 @@ function attachTodoEvents(listId,todosRef,storageKey){
       e.preventDefault();
       var nid=tMaxId(todosRef)+1;
       f.parent.splice(f.index+1,0,{id:nid,text:'',priority:f.item.priority,children:[],collapsed:false,completed:false});
-      tSave(storageKey,todosRef);renderAllTodos();
+      tSaveSync(storageKey,todosRef);renderAllTodos();
       setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50);
     } else if(e.key==='Tab'&&!e.shiftKey){
       e.preventDefault();
       var prev=null;
       var flatEls=list.querySelectorAll('.todo-item');
       var ci=-1;for(var i=0;i<flatEls.length;i++){if(parseInt(flatEls[i].dataset.tid)===id){ci=i;break}}
-      if(ci>0){var pid=parseInt(flatEls[ci-1].dataset.tid);var pf=tFind(todosRef,pid);if(pf){f.parent.splice(f.index,1);if(!pf.item.children)pf.item.children=[];pf.item.children.push(f.item);tSave(storageKey,todosRef);renderAllTodos()}}
+      if(ci>0){var pid=parseInt(flatEls[ci-1].dataset.tid);var pf=tFind(todosRef,pid);if(pf){f.parent.splice(f.index,1);if(!pf.item.children)pf.item.children=[];pf.item.children.push(f.item);tSaveSync(storageKey,todosRef);renderAllTodos()}}
     } else if(e.key==='Backspace'&&!txt){
       e.preventDefault();
       var li=tFind(todosRef,id);
       if(!li || (f.item.children&&f.item.children.length>0)) return;
-      li.parent.splice(li.index,1);tSave(storageKey,todosRef);renderAllTodos();
+      li.parent.splice(li.index,1);tSaveSync(storageKey,todosRef);renderAllTodos();
     }
   });
 
@@ -531,7 +584,7 @@ function attachTodoEvents(listId,todosRef,storageKey){
     var fi=sameParent&&src.index<dst.index?dst.index-1:dst.index;
     if(tgt.classList.contains('drag-below'))fi++;
     dst.parent.splice(fi,0,src.item);
-    tSave(storageKey,todosRef);renderAllTodos();
+    tSaveSync(storageKey,todosRef);renderAllTodos();
   });
 }
 
@@ -540,7 +593,7 @@ function setupAddButton(btnId,todosRef,storageKey,isMonth){
   btn.onclick=function(){
     var nid=tMaxId(todosRef)+1;
     todosRef.push({id:nid,text:'',priority:'normal',children:[],collapsed:false,completed:false});
-    tSave(storageKey,todosRef);renderAllTodos();
+    tSaveSync(storageKey,todosRef);renderAllTodos();
     var listId=isMonth?'monthTodoList':'weekTodoList';
     setTimeout(function(){var it=document.querySelector('#'+listId+' .todo-text[data-tid=\"'+nid+'\"]');if(it)it.focus()},50);
   };
@@ -570,6 +623,17 @@ function initTodos(){
     tSave('bht_month_todos_v2',monthTodos);
   }
   renderAllTodos();
+  // Background: pull from GitHub for cross-device sync
+  ghPull().then(function(data){
+    if(!data||data==='_unchanged_') return;
+    if(data.week&&data.week.length&&JSON.stringify(data.week)!==JSON.stringify(weekTodos)){
+      weekTodos=data.week;tSave('bht_week_todos_v2',weekTodos);
+    }
+    if(data.month&&data.month.length&&JSON.stringify(data.month)!==JSON.stringify(monthTodos)){
+      monthTodos=data.month;tSave('bht_month_todos_v2',monthTodos);
+    }
+    renderAllTodos();
+  });
 }
 
 function renderAllTodos(){
@@ -1130,6 +1194,9 @@ if os.path.exists(TODO_DATA_FILE):
     except Exception:
         pass
 
+# ===== GitHub Token (from env var, never committed) =====
+github_token = os.environ.get('BHT_GITHUB_TOKEN', '')
+
 # ===== Assemble final HTML =====
 html_parts = []
 html_parts.append('''<!DOCTYPE html>
@@ -1278,6 +1345,7 @@ js = js.replace('__WEEKLY_DATA__', weekly_json)
 js = js.replace('__WEEKS__', weeks_json)
 js = js.replace('__DEFAULT_TAB__', default_tab)
 js = js.replace('__MONTH_BOUNDARIES__', json.dumps(month_boundaries))
+js = js.replace('__GH_TOKEN__', github_token)
 
 html_parts.append(js)
 ed = '''
