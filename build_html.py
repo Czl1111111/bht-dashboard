@@ -23,63 +23,39 @@ except:
 # ===== Build WEEKS array =====
 WEEKS = []
 
+# Group data weeks by their month (from Excel, not calendar)
+month_weeks = {}
+for wk_key, wdata in weekly_weeks.items():
+    mo = wdata.get('month', 0)
+    if mo not in month_weeks:
+        month_weeks[mo] = []
+    month_weeks[mo].append((wk_key, wdata))
+
 for mk in sorted(ALL_MONTHS.keys()):
     md = ALL_MONTHS[mk]
     yr = int(mk[:4])
     mo = int(mk[4:6])
     label = md.get('label', f'{mo}月')
 
-    def get_month_weeks(year, month):
-        weeks = []
-        first_day = datetime(year, month, 1)
-        if month == 12:
-            last_day = datetime(year + 1, 1, 1) - timedelta(days=1)
-        else:
-            last_day = datetime(year, month + 1, 1) - timedelta(days=1)
-        start_week = first_day.isocalendar()[1]
-        end_week = last_day.isocalendar()[1]
-        start_year = first_day.isocalendar()[0]
-        end_year = last_day.isocalendar()[0]
-        wk = start_week
-        wy = start_year
-        while True:
-            monday = datetime.strptime(f'{wy}-{wk}-1', '%G-%V-%u')
-            sunday = monday + timedelta(days=6)
-            if not (sunday < first_day or monday > last_day):
-                weeks.append({
-                    'year': wy, 'week': wk,
-                    'mon': monday.strftime('%m/%d'),
-                    'sun': sunday.strftime('%m/%d'),
-                    'key': f'{wy}_{wk:02d}',
-                })
-            if wk == end_week and wy == end_year:
-                break
-            wk += 1
-            if wk > 52:
-                wk = 1
-                wy += 1
-        return weeks
+    # Use data weeks for this month, sorted by week key
+    data_weeks = month_weeks.get(mo, [])
+    data_weeks.sort(key=lambda x: x[0])
 
-    cal = get_month_weeks(yr, mo)
-    for i, cw in enumerate(cal):
-        wk_key = cw['key']
-        has_real = wk_key in weekly_weeks
+    for i, (wk_key, wdata) in enumerate(data_weeks):
         wk_id = f'w{mk}_{i+1}'
-        sub = f'{cw["mon"]}-{cw["sun"]}'
-
+        dr = wdata.get('dateRange', '')
+        sub = ''
         partial = False
-        if has_real:
-            wdata = weekly_weeks[wk_key]
-            dr = wdata.get('dateRange', '')
-            if '~' in dr:
-                parts = dr.split('~')
-                if len(parts) == 2:
-                    try:
-                        d1 = datetime.strptime(parts[0].strip(), '%Y-%m-%d')
-                        d2 = datetime.strptime(parts[1].strip(), '%Y-%m-%d')
-                        partial = (d2 - d1).days < 6
-                    except:
-                        pass
+        if '~' in dr:
+            parts = dr.split('~')
+            if len(parts) == 2:
+                try:
+                    d1 = datetime.strptime(parts[0].strip(), '%Y-%m-%d')
+                    d2 = datetime.strptime(parts[1].strip(), '%Y-%m-%d')
+                    sub = f'{d1.strftime("%m/%d")}-{d2.strftime("%m/%d")}'
+                    partial = (d2 - d1).days < 6
+                except:
+                    sub = dr
 
         WEEKS.append({
             'id': wk_id,
@@ -87,9 +63,23 @@ for mk in sorted(ALL_MONTHS.keys()):
             'sub': sub,
             'monthKey': mk,
             'wkKey': wk_key,
-            'hasReal': has_real,
+            'hasReal': True,
             'partial': partial,
             'est': False,
+            'ratio': None,
+        })
+
+    # If no data weeks for this month, add empty placeholder
+    if not data_weeks:
+        WEEKS.append({
+            'id': f'w{mk}_1',
+            'label': f'{mo}月W1',
+            'sub': '(暂无数据)',
+            'monthKey': mk,
+            'wkKey': None,
+            'hasReal': False,
+            'partial': False,
+            'est': True,
             'ratio': None,
         })
 
