@@ -341,17 +341,35 @@ async function ghPush(weekData,monthData){
   if(!window._GH_TOKEN) return false;
   var st=document.getElementById('ghSyncStatus');
   try{
-    var getResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{headers:{Authorization:'Bearer '+window._GH_TOKEN}});
-    var sha = getResp.ok ? (await getResp.json()).sha : null;
-    var body = {message:'sync: update todo data',content:_ghContent({week:weekData,month:monthData})};
-    if(sha) body.sha = sha;
-    var putResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{
-      method:'PUT',headers:{Authorization:'Bearer '+window._GH_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)
-    });
+    var BASE='https://api.github.com/repos/Czl1111111/bht-dashboard';
+    var HDR={Authorization:'Bearer '+window._GH_TOKEN,'Content-Type':'application/json'};
+    var payload=JSON.stringify({week:weekData,month:monthData});
+    // 1. Create blob (utf-8 encoding, no base64)
+    var blobResp=await fetch(BASE+'/git/blobs',{method:'POST',headers:HDR,body:JSON.stringify({content:payload,encoding:'utf-8'})});
+    if(!blobResp.ok) throw new Error('blob failed');
+    var blobSha=(await blobResp.json()).sha;
+    // 2. Get base commit
+    var refResp=await fetch(BASE+'/git/refs/heads/master',{headers:HDR});
+    if(!refResp.ok) throw new Error('ref failed');
+    var baseSha=(await refResp.json()).object.sha;
+    var commitResp=await fetch(BASE+'/git/commits/'+baseSha,{headers:HDR});
+    if(!commitResp.ok) throw new Error('commit failed');
+    var baseTree=(await commitResp.json()).tree.sha;
+    // 3. Create new tree
+    var treeResp=await fetch(BASE+'/git/trees',{method:'POST',headers:HDR,body:JSON.stringify({base_tree:baseTree,tree:[{path:'todo_data.json',mode:'100644',type:'blob',sha:blobSha}]})});
+    if(!treeResp.ok) throw new Error('tree failed');
+    var newTree=(await treeResp.json()).sha;
+    // 4. Create commit
+    var newCommitResp=await fetch(BASE+'/git/commits',{method:'POST',headers:HDR,body:JSON.stringify({message:'sync: todo update',tree:newTree,parents:[baseSha]})});
+    if(!newCommitResp.ok) throw new Error('new commit failed');
+    var newCommit=(await newCommitResp.json()).sha;
+    // 5. Update ref
+    var patchResp=await fetch(BASE+'/git/refs/heads/master',{method:'PATCH',headers:HDR,body:JSON.stringify({sha:newCommit})});
+    if(!patchResp.ok) throw new Error('patch failed');
     _GH_SYNC_DIRTY = false;
-    if(st){st.textContent=putResp.ok?'✅ 已同步':'❌ 同步失败';st.style.color=putResp.ok?'#22c55e':'#ef4444';}
-    return putResp.ok;
-  }catch(e){_GH_SYNC_DIRTY = true;if(st){st.textContent='❌ 同步失败';st.style.color='#ef4444';}return false;}
+    if(st){st.textContent='✅ 已同步';st.style.color='#22c55e';}
+    return true;
+  }catch(e){_GH_SYNC_DIRTY = true;if(st){st.textContent='❌ 同步失败';st.style.color='#ef4444';}console.error('ghPush:',e);return false;}
 }
 
 function ghScheduleSync(){
