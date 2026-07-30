@@ -197,8 +197,17 @@
       "id": 1039,
       "text": "袋装BHT没有控制在6.5%",
       "priority": "normal",
-      "children": [],
-      "collapsed": true,
+      "children": [
+        {
+          "id": 1040,
+          "text": "",
+          "priority": "normal",
+          "children": [],
+          "collapsed": false,
+          "completed": false
+        }
+      ],
+      "collapsed": false,
       "completed": false
     }
   ],
