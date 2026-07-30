@@ -79,16 +79,12 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
     ad = sum(abs(n(v)) for v in grp.iloc[:,21])
     ad_sales = sum(abs(n(v)) for v in grp.iloc[:,22]) if grp.shape[1] > 22 else 0
     sessions = int(sum(abs(n(v)) for v in grp.iloc[:,8])) if grp.shape[1] > 8 else 0
-    # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) 加权平均
+    # 产品表现: 订单毛利润(col[16]) / 销售额 = 订单毛利率 (与领星一致)
     profit = sum(n(v) for v in grp.iloc[:,16])
-    weighted_margin_sum = 0.0
-    for idx in range(len(grp)):
-        row_s = abs(n(grp.iloc[idx,13]))
-        m_str = str(grp.iloc[idx,35])
-        try: row_m = float(m_str.replace('%','').replace(',',''))
-        except: row_m = 0
-        weighted_margin_sum += row_s * row_m
-    margin = round(weighted_margin_sum/sales, 2) if sales>0 else 0
+    # 结算毛利润(col[15])
+    settle_profit = sum(n(v) for v in grp.iloc[:,15]) if grp.shape[1] > 15 else 0
+    margin = round(profit/sales*100, 2) if sales>0 else 0
+    settle_margin_total = round(settle_profit/sales*100, 2) if sales>0 else 0
     tacos = round(ad/sales*100, 2) if sales>0 else 0
 
     parents = {}
@@ -98,17 +94,10 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
         po = int(sum(abs(n(v)) for v in sub.iloc[:,11]))  # col[11]=销量
         pa = sum(abs(n(v)) for v in sub.iloc[:,21])
         pp = sum(n(v) for v in sub.iloc[:,16])
-        pwms = 0.0
-        for idx in range(len(sub)):
-            row_s = abs(n(sub.iloc[idx,13]))
-            m_str = str(sub.iloc[idx,35])
-            try: row_m = float(m_str.replace('%','').replace(',',''))
-            except: row_m = 0
-            pwms += row_s * row_m
         parents[pid] = {
             'name': PNAMES.get(pid, pid), 'n': sub[sku_col].nunique(),
             'o': po, 's': round(ps), 'ad': round(pa), 'pf': round(pp),
-            'margin': round(pwms/ps, 2) if ps>0 else 0,
+            'margin': round(pp/ps*100, 2) if ps>0 else 0,
             'tacos': round(pa/ps*100, 2) if ps>0 else 0
         }
 
@@ -119,24 +108,12 @@ for (yr, wk), grp in df_f.groupby([df.columns[0], df.columns[2]]):
         s_total = sum(abs(n(v)) for v in sgrp.iloc[:,13])
         o_total = int(sum(abs(n(v)) for v in sgrp.iloc[:,11]))  # col[11]=销量
         a_total = sum(abs(n(v)) for v in sgrp.iloc[:,21])
-        # 产品表现: 订单毛利润(col[16]), 订单毛利率(col[35]) & 结算毛利率(col[34]) 加权平均
+        # 产品表现: 订单毛利润(col[16]), 结算毛利润(col[15])
+        # 直接用 利润÷销售额 计算毛利率，与领星显示一致
         p_total = sum(n(v) for v in sgrp.iloc[:,16])
-        weighted_m = 0.0
-        weighted_settle_m = 0.0
-        for idx in range(len(sgrp)):
-            row_s = abs(n(sgrp.iloc[idx,13]))
-            # 订单毛利率 col[35]
-            m_str = str(sgrp.iloc[idx,35])
-            try: row_m = float(m_str.replace('%','').replace(',',''))
-            except: row_m = 0
-            weighted_m += row_s * row_m
-            # 结算毛利率 col[34]
-            sm_str = str(sgrp.iloc[idx,34])
-            try: row_sm = float(sm_str.replace('%','').replace(',',''))
-            except: row_sm = 0
-            weighted_settle_m += row_s * row_sm
-        m = round(weighted_m/s_total, 2) if s_total>0 else 0
-        settle_m = round(weighted_settle_m/s_total, 2) if s_total>0 else 0
+        settle_p_total = sum(n(v) for v in sgrp.iloc[:,15]) if sgrp.shape[1] > 15 else 0
+        m = round(p_total/s_total*100, 2) if s_total>0 else 0
+        settle_m = round(settle_p_total/s_total*100, 2) if s_total>0 else 0
         first_row = sgrp.iloc[0]
 
         # TACoS: computed from weekly totals

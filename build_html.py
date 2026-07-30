@@ -300,19 +300,55 @@ function toggleTodoFold(type,expand){var list=type==='week'?weekTodos:monthTodos
 function exportTodos(storageKey){
   var data=localStorage.getItem(storageKey);
   if(!data){alert('没有可导出的待办事项数据');return}
-  var blob=new Blob([data],{type:'application/json'});
+  var todos=JSON.parse(data);
+  // Export as CSV for easy viewing in Excel/WPS
+  var csv='﻿优先级,层级,待办事项,子项数\n';
+  function walk(arr,lvl,parentPrio){
+    arr.forEach(function(t){
+      var prio=t.priority==='urgent'?'紧急':(t.priority==='important'?'重要':'普通');
+      csv+=prio+','+lvl+',\"'+t.text.replace(/\"/g,'\"\"')+'\",'+(t.children?t.children.length:0)+'\n';
+      if(t.children&&t.children.length) walk(t.children,lvl+1,t.priority);
+    });
+  }
+  walk(todos,0,'');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');a.href=url;a.download=storageKey+'_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  var a=document.createElement('a');a.href=url;a.download=storageKey+'_backup_'+new Date().toISOString().slice(0,10)+'.csv';
   a.click();URL.revokeObjectURL(url);
 }
 function importTodos(storageKey){
-  var inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  var inp=document.createElement('input');inp.type='file';inp.accept='.csv,.json';
   inp.onchange=function(){
     var file=inp.files[0];if(!file)return;
     var reader=new FileReader();
     reader.onload=function(e){
-      try{var data=JSON.parse(e.target.result);localStorage.setItem(storageKey,JSON.stringify(data));alert('导入成功！页面将刷新');location.reload()}
-      catch(ex){alert('导入失败：文件格式不正确')}
+      try{
+        var text=e.target.result;
+        var todos;
+        if(text.trim().startsWith('﻿')||text.indexOf(',')>0){
+          // CSV import: rebuild tree from flat CSV
+          var lines=text.trim().split('\n');
+          var stack=[],roots=[],nextId=10000;
+          for(var i=1;i<lines.length;i++){
+            if(!lines[i].trim()) continue;
+            var parts=lines[i].match(/([^,]*),(\d*),\"((?:[^\"]|\"\")*)\",(\d*)/);
+            if(!parts) continue;
+            var lvl=parseInt(parts[2])||0, txt=parts[3].replace(/\"\"/g,'\"'), childCount=parseInt(parts[4])||0;
+            var item={id:++nextId,text:txt,priority:parts[1]==='紧急'?'urgent':(parts[1]==='重要'?'important':'normal'),children:[],collapsed:false};
+            while(stack.length>lvl) stack.pop();
+            if(stack.length===0) roots.push(item);
+            else{var p=stack[stack.length-1];p.children.push(item);p.collapsed=false}
+            stack.push(item);
+          }
+          todos=roots;
+        } else {
+          // JSON import (backward compatible)
+          todos=JSON.parse(text);
+        }
+        localStorage.setItem(storageKey,JSON.stringify(todos));
+        alert('导入成功！页面将刷新');
+        location.reload();
+      } catch(ex){alert('导入失败：'+ex.message)}
     };
     reader.readAsText(file);
   };
