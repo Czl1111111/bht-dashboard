@@ -369,7 +369,12 @@ async function ghPush(weekData,monthData){
     _GH_SYNC_DIRTY = false;
     if(st){st.textContent='✅ 已同步';st.style.color='#22c55e';}
     return true;
-  }catch(e){_GH_SYNC_DIRTY = true;if(st){st.textContent='❌ 同步失败';st.style.color='#ef4444';}console.error('ghPush:',e);return false;}
+  }catch(e){_GH_SYNC_DIRTY = true;
+    var msg='❌ '+e.message;
+    if(st){st.textContent=msg;st.style.color='#ef4444';}
+    console.error('ghPush:',e);
+    throw e;
+  }
 }
 
 function ghScheduleSync(){
@@ -380,7 +385,7 @@ function ghScheduleSync(){
   if(st){st.textContent='⏳ 同步中...';st.style.color='#f59e0b';}
   _GH_SYNC_TIMER = setTimeout(function(){
     if(!_GH_SYNC_DIRTY) return;
-    ghPush(weekTodos,monthTodos);
+    ghPush(weekTodos,monthTodos).catch(function(){});
   },2000);
 }
 
