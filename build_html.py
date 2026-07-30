@@ -461,20 +461,21 @@ function attachTodoEvents(listId,todosRef,storageKey){
   list.addEventListener('dragstart',function(e){
     var grip=e.target.closest('.grip');if(!grip)return;
     var item=grip.closest('.todo-item');if(!item)return;
+    e.stopPropagation();
     e.dataTransfer.setData('text/plain',item.dataset.tid);
     item.classList.add('drag-ghost');
   });
   list.addEventListener('dragend',function(e){
     var items=list.querySelectorAll('.todo-item');items.forEach(function(it){it.classList.remove('drag-ghost','drag-above','drag-below')});
   });
-  list.addEventListener('dragover',function(e){e.preventDefault();
+  list.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();
     var tgt=e.target.closest('.todo-item');if(!tgt||tgt.classList.contains('drag-ghost'))return;
     var rect=tgt.getBoundingClientRect(),mid=rect.top+rect.height/2;
     list.querySelectorAll('.todo-item').forEach(function(it){it.classList.remove('drag-above','drag-below')});
     tgt.classList.add(e.clientY<mid?'drag-above':'drag-below');
   });
   list.addEventListener('drop',function(e){
-    e.preventDefault();
+    e.preventDefault();e.stopPropagation();
     var srcId=parseInt(e.dataTransfer.getData('text/plain'));
     var tgt=e.target.closest('.todo-item');if(!tgt||tgt.classList.contains('drag-ghost'))return;
     var dstId=parseInt(tgt.dataset.tid);
@@ -591,20 +592,20 @@ function initDragDrop(){
     e.dataTransfer.setData('text/plain','');
   });
   container.addEventListener('dragover',function(e){
-    if(!dragged) return;
+    if(!dragged||e.target.closest('.todo-item')) return;
     e.preventDefault();
     e.dataTransfer.dropEffect='move';
     var wrap=e.target.closest('.section-wrap');
     if(wrap&&wrap!==dragged) wrap.classList.add('drag-over');
   });
   container.addEventListener('dragleave',function(e){
-    if(!dragged) return;
+    if(!dragged||e.target.closest('.todo-item')) return;
     var wrap=e.target.closest('.section-wrap');
     // Only remove highlight when truly leaving the section, not when entering a child
     if(wrap&&!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over');
   });
   container.addEventListener('drop',function(e){
-    if(!dragged) return;
+    if(!dragged||e.target.closest('.todo-item')) return;
     e.preventDefault();
     var wrap=e.target.closest('.section-wrap');
     if(wrap&&dragged&&wrap!==dragged){
