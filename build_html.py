@@ -304,7 +304,7 @@ function _ghContent(json){
 }
 
 async function ghPull(){
-  if(!window._GH_TOKEN||window._GH_TOKEN==='__GH_TOKEN__'||window._GH_TOKEN==='') return null;
+  if(!window._GH_TOKEN) return null;
   try{
     var headers = {Authorization:'Bearer '+window._GH_TOKEN};
     if(_GH_LAST_ETAG) headers['If-None-Match'] = _GH_LAST_ETAG;
@@ -319,7 +319,7 @@ async function ghPull(){
 }
 
 async function ghPush(weekData,monthData){
-  if(!window._GH_TOKEN||window._GH_TOKEN==='__GH_TOKEN__'||window._GH_TOKEN==='') return false;
+  if(!window._GH_TOKEN) return false;
   try{
     var getResp = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{headers:{Authorization:'Bearer '+window._GH_TOKEN}});
     var sha = getResp.ok ? (await getResp.json()).sha : null;
