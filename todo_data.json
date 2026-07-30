@@ -200,23 +200,6 @@
       "children": [],
       "collapsed": true,
       "completed": false
-    },
-    {
-      "id": 1041,
-      "text": "下周待办事项",
-      "priority": "normal",
-      "children": [
-        {
-          "id": 1042,
-          "text": "1. 420/520/620",
-          "priority": "normal",
-          "children": [],
-          "collapsed": false,
-          "completed": false
-        }
-      ],
-      "collapsed": false,
-      "completed": false
     }
   ],
   "month": [
