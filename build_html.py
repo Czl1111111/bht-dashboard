@@ -359,7 +359,7 @@ function importTodos(storageKey){
   inp.click();
 }
 function tFlatten(arr,level,filt){
-  var r=[];for(var i=0;i<arr.length;i++){var t=arr[i];var self=(filt==='all'||t.priority===filt);if(self)r.push({id:t.id,text:t.text,priority:t.priority,level:level,hasChildren:!!(t.children&&t.children.length>0),collapsed:!!t.collapsed,childCount:t.children?t.children.length:0});if(t.children&&t.children.length>0&&!t.collapsed){var k=tFlatten(t.children,level+1,filt);for(var j=0;j<k.length;j++)r.push(k[j])}}return r}
+  var r=[];for(var i=0;i<arr.length;i++){var t=arr[i];var self=(filt==='all'||t.priority===filt);if(self)r.push({id:t.id,text:t.text,priority:t.priority,level:level,hasChildren:!!(t.children&&t.children.length>0),collapsed:!!t.collapsed,completed:!!t.completed,childCount:t.children?t.children.length:0});if(t.children&&t.children.length>0&&!t.collapsed){var k=tFlatten(t.children,level+1,filt);for(var j=0;j<k.length;j++)r.push(k[j])}}return r}
 
 function genDefaults(isMonth,wd){
   var items=[];
