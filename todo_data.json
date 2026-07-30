@@ -27,14 +27,6 @@
               "completed": false
             },
             {
-              "id": 1037,
-              "text": "盒装BHT的分析已给到",
-              "priority": "urgent",
-              "children": [],
-              "collapsed": true,
-              "completed": false
-            },
-            {
               "id": 1036,
               "text": "标题已全部做修改且成功",
               "priority": "urgent",
@@ -43,11 +35,19 @@
               "completed": false
             }
           ],
+          "collapsed": false,
+          "completed": false
+        },
+        {
+          "id": 1037,
+          "text": "盒装BHT的分析已给到",
+          "priority": "urgent",
+          "children": [],
           "collapsed": true,
           "completed": false
         }
       ],
-      "collapsed": true,
+      "collapsed": false,
       "completed": false
     },
     {
