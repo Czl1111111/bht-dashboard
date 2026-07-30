@@ -25,17 +25,17 @@
               ],
               "collapsed": true,
               "completed": false
-            },
-            {
-              "id": 1036,
-              "text": "标题已全部做修改且成功",
-              "priority": "urgent",
-              "children": [],
-              "collapsed": true,
-              "completed": false
             }
           ],
-          "collapsed": false,
+          "collapsed": true,
+          "completed": false
+        },
+        {
+          "id": 1036,
+          "text": "标题已全部做修改且成功",
+          "priority": "urgent",
+          "children": [],
+          "collapsed": true,
           "completed": false
         },
         {
