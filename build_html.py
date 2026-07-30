@@ -305,15 +305,19 @@ function ghSetToken(tk){
   var st=document.getElementById('ghSyncStatus');
   if(tk){
     if(st)st.textContent='⏳ 同步中...';if(st)st.style.color='#f59e0b';
-    ghPull().then(function(d){
-      if(!d||d==='_unchanged_'){if(st)st.textContent='✅ 已连接';if(st)st.style.color='#22c55e';return}
+    // 1. Push current data to GitHub
+    ghPush(weekTodos,monthTodos).then(function(){
+      // 2. Then pull to confirm
+      return ghPull();
+    }).then(function(d){
+      if(!d||d==='_unchanged_'){if(st)st.textContent='✅ 已同步';if(st)st.style.color='#22c55e';return}
       if(d.week&&d.week.length){weekTodos=d.week;tSave('bht_week_todos_v2',weekTodos)}
       if(d.month&&d.month.length){monthTodos=d.month;tSave('bht_month_todos_v2',monthTodos)}
       renderAllTodos();
       if(st)st.textContent='✅ 已同步';if(st)st.style.color='#22c55e';
     }).catch(function(){if(st)st.textContent='❌ 连接失败';if(st)st.style.color='#ef4444'});
   } else {
-    if(st)st.textContent='';if(st)st.style.color='';
+    if(st)st.textContent='👁 只读模式';if(st)st.style.color='#8b90a0';
   }
   renderAllTodos();
 }
@@ -323,17 +327,23 @@ function _ghContent(json){
 }
 
 async function ghPull(){
-  if(!window._GH_TOKEN) return null;
   try{
-    var headers = {Authorization:'Bearer '+window._GH_TOKEN};
-    if(_GH_LAST_ETAG) headers['If-None-Match'] = _GH_LAST_ETAG;
-    var r = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{cache:'no-store',headers:headers});
-    if(r.status===304) return '_unchanged_';
-    if(!r.ok) return null;
-    var j = await r.json();
-    _GH_LAST_ETAG = r.headers.get('ETag')||null;
-    var content = JSON.parse(decodeURIComponent(escape(atob(j.content))));
-    return content;
+    if(window._GH_TOKEN){
+      // Authenticated: use API with ETag for efficiency
+      var headers = {Authorization:'Bearer '+window._GH_TOKEN};
+      if(_GH_LAST_ETAG) headers['If-None-Match'] = _GH_LAST_ETAG;
+      var r = await fetch('https://api.github.com/repos/Czl1111111/bht-dashboard/contents/todo_data.json',{cache:'no-store',headers:headers});
+      if(r.status===304) return '_unchanged_';
+      if(!r.ok) return null;
+      var j = await r.json();
+      _GH_LAST_ETAG = r.headers.get('ETag')||null;
+      return JSON.parse(decodeURIComponent(escape(atob(j.content))));
+    } else {
+      // Public: fetch raw file (read-only, no token needed)
+      var r2 = await fetch('https://raw.githubusercontent.com/Czl1111111/bht-dashboard/master/todo_data.json',{cache:'no-store'});
+      if(!r2.ok) return null;
+      return await r2.json();
+    }
   }catch(e){return null;}
 }
 
@@ -679,6 +689,15 @@ document.addEventListener('DOMContentLoaded',function(){
   var st=document.getElementById('ghSyncStatus');
   if(_GH_TOKEN){
     if(st)st.textContent='✅ 已连接';if(st)st.style.color='#22c55e';
+  } else {
+    if(st)st.textContent='👁 只读模式';if(st)st.style.color='#8b90a0';
+    // Even without token, try to pull latest data from public raw URL
+    ghPull().then(function(d){
+      if(!d||d==='_unchanged_') return;
+      if(d.week&&d.week.length){weekTodos=d.week;tSave('bht_week_todos_v2',weekTodos)}
+      if(d.month&&d.month.length){monthTodos=d.month;tSave('bht_month_todos_v2',monthTodos)}
+      renderAllTodos();
+    });
   }
 });
 
