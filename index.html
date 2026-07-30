@@ -373,6 +373,7 @@ async function ghPush(weekData,monthData){
 }
 
 function ghScheduleSync(){
+  if(!window._GH_TOKEN) return;
   if(_GH_SYNC_TIMER) clearTimeout(_GH_SYNC_TIMER);
   _GH_SYNC_DIRTY = true;
   var st=document.getElementById('ghSyncStatus');
