@@ -1118,6 +1118,9 @@ html_parts.append('''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>BHT产品线 - 运营数据看板</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%23fef3c7' stroke='%23f59e0b' stroke-width='3'/><text x='50' y='68' text-anchor='middle' fill='%2392410e' font-size='36' font-weight='bold' font-family='sans-serif'>BHT</text></svg>">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
